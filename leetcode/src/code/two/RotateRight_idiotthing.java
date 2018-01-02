@@ -6,7 +6,7 @@ package code.two;
 //Given 1->2->3->4->5->NULL and k = 2,
 //return 4->5->1->2->3->NULL.
 public class RotateRight_idiotthing {
-	public ListNode rotateRight(ListNode head, int k) {
+	public ListNode rotateRight(final ListNode head, final int k) {
 		if (head == null || k == 0) {
 			return head;
 		}
@@ -27,7 +27,7 @@ public class RotateRight_idiotthing {
 		if (node.next == null) {
 			return head;
 		}
-		ListNode q = node.next;
+		final ListNode q = node.next;
 		node.next = null;
 		tail.next = head;
 
@@ -36,10 +36,10 @@ public class RotateRight_idiotthing {
 }
 
 class ListNode {
-	ListNode next;
-	int val;
+	public ListNode next;
+	public int val;
 
-	public ListNode(int x) {
+	public ListNode(final int x) {
 		val = x;
 	}
 }
