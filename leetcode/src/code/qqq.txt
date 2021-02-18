@@ -1,0 +1,4844 @@
+606. Construct String from Binary Tree
+Easy
+
+774
+
+1048
+
+Add to List
+
+Share
+You need to construct a string consists of parenthesis and integers from a binary tree with the preorder traversing way.
+
+The null node needs to be represented by empty parenthesis pair "()". And you need to omit all the empty parenthesis pairs that don't affect the one-to-one mapping relationship between the string and the original binary tree.
+
+Example 1:
+Input: Binary tree: [1,2,3,4]
+       1
+     /   \
+    2     3
+   /    
+  4     
+
+Output: "1(2(4))(3)"
+
+Explanation: Originallay it needs to be "1(2(4)())(3()())", 
+but you need to omit all the unnecessary empty parenthesis pairs. 
+And it will be "1(2(4))(3)".
+Example 2:
+Input: Binary tree: [1,2,3,null,4]
+       1
+     /   \
+    2     3
+     \  
+      4 
+
+Output: "1(2()(4))(3)"
+
+Explanation: Almost the same as the first example, 
+except we can't omit the first parenthesis pair to break the one-to-one mapping relationship between the input and the output.
+
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    public String tree2str(TreeNode t) {
+        if(t==null){
+    		return "";
+    	}
+
+    	String s ="";
+
+    	String r=tree2str(t.right);
+    	String l = tree2str(t.left);
+        if(l.length()==0){
+            if(r.length()>0)
+            s="()";
+        }else{
+            s="("+l+")";
+        }
+        
+        
+        
+        
+        if(r.length()>0){
+            s+="("+r+")";
+        }
+    	
+
+    	if(t!=null){
+            
+    		s=t.val+s;
+    	}
+
+
+    	return s;
+    }
+}
+
+609. Find Duplicate File in System
+Medium
+
+437
+
+604
+
+Add to List
+
+Share
+Given a list of directory info including directory path, and all the files with contents in this directory, you need to find out all the groups of duplicate files in the file system in terms of their paths.
+
+A group of duplicate files consists of at least two files that have exactly the same content.
+
+A single directory info string in the input list has the following format:
+
+"root/d1/d2/.../dm f1.txt(f1_content) f2.txt(f2_content) ... fn.txt(fn_content)"
+
+It means there are n files (f1.txt, f2.txt ... fn.txt with content f1_content, f2_content ... fn_content, respectively) in directory root/d1/d2/.../dm. Note that n >= 1 and m >= 0. If m = 0, it means the directory is just the root directory.
+
+The output is a list of group of duplicate file paths. For each group, it contains all the file paths of the files that have the same content. A file path is a string that has the following format:
+
+"directory_path/file_name.txt"
+
+Example 1:
+
+Input:
+["root/a 1.txt(abcd) 2.txt(efgh)", "root/c 3.txt(abcd)", "root/c/d 4.txt(efgh)", "root 4.txt(efgh)"]
+Output:  
+[["root/a/2.txt","root/c/d/4.txt","root/4.txt"],["root/a/1.txt","root/c/3.txt"]]
+ 
+
+Note:
+
+No order is required for the final output.
+You may assume the directory name, file name and file content only has letters and digits, and the length of file content is in the range of [1,50].
+The number of files given is in the range of [1,20000].
+You may assume no files or directories share the same name in the same directory.
+You may assume each given directory info represents a unique directory. Directory path and file info are separated by a single blank space.
+ 
+
+Follow-up beyond contest:
+Imagine you are given a real file system, how will you search files? DFS or BFS?
+If the file content is very large (GB level), how will you modify your solution?
+If you can only read the file by 1kb each time, how will you modify your solution?
+What is the time complexity of your modified solution? What is the most time-consuming part and memory consuming part of it? How to optimize?
+How to make sure the duplicated files you find are not false positive?
+
+["root/a 1.txt(abcd) 2.txt(efsfgh)","root/c 3.txt(abdfcd)","root/c/d 4.txt(efggdfh)"]
+class Solution {
+    public List<List<String>> findDuplicate(String[] paths) {
+    	Map<String,List<String>> map = new HashMap<>();
+    	List<List<String>> list = new ArrayList<>();
+    	for(String path : paths){
+    		String[] ss = path.split("\\s+");
+    		String a=ss[0]+"/";
+    		for(int i = 1;i<ss.length;i++){
+    			int j = ss[i].indexOf("(");
+    			String file = ss[i].substring(0,j);
+    			String key = ss[i].substring(j,ss[i].length());
+    			if(!map.containsKey(key)){
+    				map.put(key,new ArrayList<>());
+    			}
+    			List<String> q = map.get(key);
+    			if(q.size()==1){
+    				list.add(q);
+    			}
+    			q.add(a+file);
+
+    		}
+
+    	}
+
+    	return list;
+        
+    }
+}
+
+611. Valid Triangle Number
+Medium
+
+1052
+
+95
+
+Add to List
+
+Share
+Given an array consists of non-negative integers, your task is to count the number of triplets chosen from the array that can make triangles if we take them as side lengths of a triangle.
+Example 1:
+Input: [2,2,3,4]
+Output: 3
+Explanation:
+Valid combinations are: 
+2,3,4 (using the first 2)
+2,3,4 (using the second 2)
+2,2,3
+Note:
+The length of the given array won't exceed 1000.
+The integers in the given array are in the range of [0, 1000].
+Accepted
+63,998
+Submissions
+132,120
+
+class Solution {
+    public int triangleNumber(int[] nums) {
+        	Arrays.sort(nums);
+        	int s= 0;
+
+    	for(int i = 0;i<nums.length-2;i++){
+    		for(int j = i+1;j<nums.length-1;j++){
+
+    			for(int k = nums.length-1;k>j;k--){
+    				if(nums[i]+nums[j]>nums[k]){
+    					s+=k-j;
+    					break;
+    				}
+    			}
+    		}
+    	}
+    	return s;
+        
+
+        Arrays.sort(nums);
+        int s = 0;
+        for(int i = nums.length-1;i>1;i--){
+        	int l = 0,r=i-1;
+        	while(r>l){
+        		if(nums[r]+nums[l]>nums[i]){
+        			s+=r-l;
+        			r--;
+        		}else{
+        			l++;
+        		}
+        	}
+        }
+        return s;
+    }
+
+     if (nums.length == 0) return 0;
+        
+        Arrays.sort(nums);
+        int count = 0;
+        for (int i = nums.length-1; i >= 2; --i) {
+            int l = 0, r = i-1;
+            
+            while (l < r) {
+                if (nums[l] + nums[r] > nums[i]) {
+                    count += (r-l);
+                    --r;
+                } else {
+                    ++l;
+                }
+            }
+        }
+        
+        return count;
+}
+
+617. Merge Two Binary Trees
+Easy
+
+3155
+
+175
+
+Add to List
+
+Share
+Given two binary trees and imagine that when you put one of them to cover the other, some nodes of the two trees are overlapped while the others are not.
+
+You need to merge them into a new binary tree. The merge rule is that if two nodes overlap, then sum node values up as the new value of the merged node. Otherwise, the NOT null node will be used as the node of new tree.
+
+Example 1:
+
+Input: 
+	Tree 1                     Tree 2                  
+          1                         2                             
+         / \                       / \                            
+        3   2                     1   3                        
+       /                           \   \                      
+      5                             4   7                  
+Output: 
+Merged tree:
+	     3
+	    / \
+	   4   5
+	  / \   \ 
+	 5   4   7
+
+	 /**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    public TreeNode mergeTrees(TreeNode t1, TreeNode t2) {
+    	if(t1==null)return t2;
+    	if(t2==null)return t1;
+
+    	t1.val=t1.val+t2.val;
+    	t1.left=mergeTrees(t1.left,t2.left);
+    	t1.right=mergeTrees(t1.right,t2.right);
+    	return t1;
+        
+    }
+}
+
+620. Not Boring Movies
+Easy
+
+265
+
+288
+
+Add to List
+
+Share
+SQL Schema
+X city opened a new cinema, many people would like to go to this cinema. The cinema also gives out a poster indicating the movies’ ratings and descriptions.
+Please write a SQL query to output movies with an odd numbered ID and a description that is not 'boring'. Order the result by rating.
+
+ 
+{"headers": ["id", "movie", "description", "rating"], "values": [[1, "War", "great 3D", 8.9], [5, "House card", "Interesting", 9.1]]}For example, table cinema:
+
++---------+-----------+--------------+-----------+
+|   id    | movie     |  description |  rating   |
++---------+-----------+--------------+-----------+
+|   1     | War       |   great 3D   |   8.9     |
+|   2     | Science   |   fiction    |   8.5     |
+|   3     | irish     |   boring     |   6.2     |
+|   4     | Ice song  |   Fantacy    |   8.6     |
+|   5     | House card|   Interesting|   9.1     |
++---------+-----------+--------------+-----------+
+For the example above, the output should be:
++---------+-----------+--------------+-----------+
+|   id    | movie     |  description |  rating   |
++---------+-----------+--------------+-----------+
+|   5     | House card|   Interesting|   9.1     |
+|   1     | War       |   great 3D   |   8.9     |
++---------+-----------+--------------+-----------+
+
+select * from cinema where id%2=1 and description!='boring' order by rating desc
+
+621. Task Scheduler
+Medium
+
+3525
+
+706
+
+Add to List
+
+Share
+You are given a char array representing tasks CPU need to do. It contains capital letters A to Z where each letter represents a different task. Tasks could be done without the original order of the array. Each task is done in one unit of time. For each unit of time, the CPU could complete either one task or just be idle.
+
+However, there is a non-negative integer n that represents the cooldown period between two same tasks (the same letter in the array), that is that there must be at least n units of time between any two same tasks.
+
+You need to return the least number of units of times that the CPU will take to finish all the given tasks.
+
+ 
+
+Example 1:
+
+Input: tasks = ["A","A","A","B","B","B"], n = 2
+Output: 8
+Explanation: 
+A -> B -> idle -> A -> B -> idle -> A -> B
+There is at least 2 units of time between any two same tasks.
+Example 2:
+
+Input: tasks = ["A","A","A","B","B","B"], n = 0
+Output: 6
+Explanation: On this case any permutation of size 6 would work since n = 0.
+["A","A","A","B","B","B"]
+["A","B","A","B","A","B"]
+["B","B","B","A","A","A"]
+...
+And so on.
+Example 3:
+
+Input: tasks = ["A","A","A","A","A","A","B","C","D","E","F","G"], n = 2
+Output: 16
+Explanation: 
+One possible solution is
+A -> B -> C -> A -> D -> E -> A -> F -> G -> A -> idle -> idle -> A -> idle -> idle -> A
+ 
+
+Constraints:
+
+The number of tasks is in the range [1, 10000].
+The integer n is in the range [0, 100].
+int i = 25, mx = cnt[25], len = tasks.size();
+        while (i >= 0 && cnt[i] == mx) --i;
+        return max(len, (mx - 1) * (n + 1) + 25 - i);
+["A","A","A","A","A","A","B","C","D","E","F","G"]
+1
+class Solution {
+    public int leastInterval(char[] tasks, int n) {
+    	if(n==0||n>=tasks.length)return tasks.length;
+    	int[] ii = new int[26];
+    	int max = 0;
+    	for(char c :tasks){
+    		ii[c-'A']++;
+    		max=Math.max(ii[c-'A'],max);
+    	}
+
+    	int z = 0;
+    	for(int i : ii){
+    		if(i==max){
+    		z++;
+    		}
+    	}
+
+    	return Math.max(tasks.length,(max-1)*(n+1)+z);
+
+    }
+}
+
+622. Design Circular Queue
+Medium
+
+593
+
+84
+
+Add to List
+
+Share
+Design your implementation of the circular queue. The circular queue is a linear data structure in which the operations are performed based on FIFO (First In First Out) principle and the last position is connected back to the first position to make a circle. It is also called "Ring Buffer".
+
+One of the benefits of the circular queue is that we can make use of the spaces in front of the queue. In a normal queue, once the queue becomes full, we cannot insert the next element even if there is a space in front of the queue. But using the circular queue, we can use the space to store new values.
+
+Your implementation should support following operations:
+
+MyCircularQueue(k): Constructor, set the size of the queue to be k.
+Front: Get the front item from the queue. If the queue is empty, return -1.
+Rear: Get the last item from the queue. If the queue is empty, return -1.
+enQueue(value): Insert an element into the circular queue. Return true if the operation is successful.
+deQueue(): Delete an element from the circular queue. Return true if the operation is successful.
+isEmpty(): Checks whether the circular queue is empty or not.
+isFull(): Checks whether the circular queue is full or not.
+ 
+
+Example:
+
+MyCircularQueue circularQueue = new MyCircularQueue(3); // set the size to be 3
+circularQueue.enQueue(1);  // return true
+circularQueue.enQueue(2);  // return true
+circularQueue.enQueue(3);  // return true
+circularQueue.enQueue(4);  // return false, the queue is full
+circularQueue.Rear();  // return 3
+circularQueue.isFull();  // return true
+circularQueue.deQueue();  // return true
+circularQueue.enQueue(4);  // return true
+circularQueue.Rear();  // return 4
+ 
+Note:
+
+All values will be in the range of [0, 1000].
+The number of operations will be in the range of [1, 1000].
+Please do not use the built-in Queue library.
+["MyCircularQueue","enQueue","Rear","Rear","deQueue","enQueue","Rear","deQueue","Front","deQueue","deQueue","deQueue"]
+[[6],[6],[],[],[],[5],[],[],[],[],[],[]]
+private int[] queue;
+    private int head;
+    private int tail;
+    private int size;
+    
+    /** Initialize your data structure here. Set the size of the queue to be k. */
+    public MyCircularQueue(int k) {
+        queue = new int[k];
+        head = -1;
+        tail = -1;
+        size = k;
+    }
+    
+    /** Insert an element into the circular queue. Return true if the operation is successful. */
+    public boolean enQueue(int value) {
+        if (isFull()) return false;
+        if (isEmpty()) {
+            head = 0;
+        }
+        tail = (tail + 1) % size;
+        queue[tail] = value;
+        return true;
+    }
+    
+    /** Delete an element from the circular queue. Return true if the operation is successful. */
+    public boolean deQueue() {
+        if (isEmpty()) return false;
+        if (head == tail) {
+            head = -1;
+            tail = -1;
+            return true;
+        }
+        head = (head + 1) % size;
+        return true;
+    }
+    
+    /** Get the front item from the queue. */
+    public int Front() {
+        if (isEmpty()) return -1;
+        return queue[head];
+    }
+    
+    /** Get the last item from the queue. */
+    public int Rear() {
+        if (isEmpty()) return -1;
+        return queue[tail];
+    }
+    
+    /** Checks whether the circular queue is empty or not. */
+    public boolean isEmpty() {
+        return tail == -1;
+    }
+    
+    /** Checks whether the circular queue is full or not. */
+    public boolean isFull() {
+        return (tail + 1) % size == head;
+    }
+class MyCircularQueue {
+
+	int size ;
+	int length=0;
+	Node head;
+	Node cur;
+	class Node{
+		Node next;
+		int value ;
+		public Node(int val){
+			this.value=val;
+		}
+	}
+
+    /** Initialize your data structure here. Set the size of the queue to be k. */
+    public MyCircularQueue(int k) {
+        size = k;
+    }
+    
+    /** Insert an element into the circular queue. Return true if the operation is successful. */
+    public boolean enQueue(int value) {
+        if(length<size){
+        	if(cur ==null){
+        		cur =new Node(value);
+        		head=cur;
+        	}else{
+        		Node next = new Node(value);
+        		cur.next = next;
+        		cur = next;
+        	}
+        	length++;
+        	return true;
+        }
+        return false;
+    }
+    
+    /** Delete an element from the circular queue. Return true if the operation is successful. */
+    public boolean deQueue() {
+    	if(length==0){
+    		return false;
+    	}
+
+    	Node t = head;
+    	head = head.next;
+    	t.next=null;
+    	t=null;
+    	length--;
+    	if(length==0){
+    		cur=null;
+    	}
+    	return true;
+        
+    }
+    
+    /** Get the front item from the queue. */
+    public int Front() {
+        if(length==0){
+        	return -1;
+        }
+        return head.value;
+    }
+    
+    /** Get the last item from the queue. */
+    public int Rear() {
+    	if(length==0){
+    		return -1;
+    	}
+
+    	return cur.value;
+        
+    }
+    
+    /** Checks whether the circular queue is empty or not. */
+    public boolean isEmpty() {
+        return length==0;
+    }
+    
+    /** Checks whether the circular queue is full or not. */
+    public boolean isFull() {
+ 		return size==length;       
+    }
+}
+
+/**
+ * Your MyCircularQueue object will be instantiated and called as such:
+ * MyCircularQueue obj = new MyCircularQueue(k);
+ * boolean param_1 = obj.enQueue(value);
+ * boolean param_2 = obj.deQueue();
+ * int param_3 = obj.Front();
+ * int param_4 = obj.Rear();
+ * boolean param_5 = obj.isEmpty();
+ * boolean param_6 = obj.isFull();
+ */
+
+
+
+ 623. Add One Row to Tree
+Medium
+
+433
+
+130
+
+Add to List
+
+Share
+Given the root of a binary tree, then value v and depth d, you need to add a row of nodes with value v at the given depth d. The root node is at depth 1.
+
+The adding rule is: given a positive integer depth d, for each NOT null tree nodes N in depth d-1, create two tree nodes with value v as N's left subtree root and right subtree root. And N's original left subtree should be the left subtree of the new left subtree root, its original right subtree should be the right subtree of the new right subtree root. If depth d is 1 that means there is no depth d-1 at all, then create a tree node with value v as the new root of the whole original tree, and the original tree is the new root's left subtree.
+给定二进制树的根，然后值 v 和深度 d，您需要在给定深度 d 添加一行具有值 v 的节点。根节点位于深度 1。
+
+添加规则是：给定一个正整数深度 d，对于深度 d-1 的每个 NOT null 树节点 N，创建两个值 v 作为 N 的左子树根和右子树根的树节点。N 的原始左子树应该是新左子树根的左子树，其原始右子树应该是新右子树根的右子树。如果深度 d 是 1，这意味着根本没有深度 d-1，则创建一个值 v 的树节点作为整个原始树的新根，而原始树是新根的左子树
+Example 1:
+Input: 
+A binary tree as following:
+       4
+     /   \
+    2     6
+   / \   / 
+  3   1 5   
+
+v = 1
+
+d = 2
+
+Output: 
+       4
+      / \
+     1   1
+    /     \
+   2       6
+  / \     / 
+ 3   1   5   
+
+Example 2:
+Input: 
+A binary tree as following:
+      4
+     /   
+    2    
+   / \   
+  3   1    
+
+v = 1
+
+d = 3
+
+Output: 
+      4
+     /   
+    2
+   / \    
+  1   1
+ /     \  
+3       1
+Note:
+The given d is in range [1, maximum depth of the given tree + 1].
+The given binary tree has at least one tree node.
+
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+
+  if(root == null)return null;
+        if(d == 1){
+            TreeNode newRoot = new TreeNode(v);
+            newRoot.left = root;
+            return newRoot;
+        }
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+        while(!queue.isEmpty()){
+            if(d-- == 0)return root;
+            int size = queue.size();
+            for(int i = 0; i < size; i++){
+                TreeNode node = queue.poll();
+                if(d == 1){
+                    TreeNode left = new TreeNode(v);
+                    left.left = node.left;
+                    node.left = left;
+                    TreeNode right = new TreeNode(v);
+                    right.right = node.right;
+                    node.right = right;
+                }else{
+                    if(node.left != null)queue.offer(node.left);
+                    if(node.right != null)queue.offer(node.right);
+                }
+            }
+        }
+        return root;
+class Solution {
+    public TreeNode addOneRow(TreeNode root, int v, int d) {
+        if(root==null)return null;
+        if(d==1){
+        	TreeNode t = new TreeNode(v);
+        	t.left = root;
+        	return t;
+        }
+        q(root,v,d,2);
+
+        return root;
+
+    }
+
+    public void q(TreeNode root, int v, int d,int q){
+    	if(root==null)return;
+    	if(q==d){
+    		
+    		TreeNode left = new TreeNode(v);
+    		TreeNode right = new TreeNode(v);
+    		left.left = root.left;
+    		right.right = root.right;
+    		root.left = left;
+    		root.right= right;
+    		return ;
+    	}
+    	q(root.left,v,d,q+1);
+    	q(root.right,v,d,q+1)
+    }
+}
+
+626. Exchange Seats
+Medium
+
+321
+
+249
+
+Add to List
+
+Share
+SQL Schema
+Mary is a teacher in a middle school and she has a table seat storing students' names and their corresponding seat ids.
+
+The column id is continuous increment.
+ 
+
+Mary wants to change seats for the adjacent students.
+ 
+
+Can you write a SQL query to output the result for Mary?
+ 
+
++---------+---------+
+|    id   | student |
++---------+---------+
+|    1    | Abbot   |
+|    2    | Doris   |
+|    3    | Emerson |
+|    4    | Green   |
+|    5    | Jeames  |
++---------+---------+
+For the sample input, the output is:
+ 
+
++---------+---------+
+|    id   | student |
++---------+---------+
+|    1    | Doris   |
+|    2    | Abbot   |
+|    3    | Green   |
+|    4    | Emerson |
+|    5    | Jeames  |
++---------+---------+
+Note:
+If the number of students is odd, there is no need to change the last one's seat.
+select id,ifnull((case when id %2 =0 then (select student from seat where id = s.id - 1) else (select student from seat where id = s.id + 1) end),student) from seat s
+
+627. Swap Salary
+Easy
+
+481
+
+288
+
+Add to List
+
+Share
+SQL Schema
+Given a table salary, such as the one below, that has m=male and f=female values. Swap all f and m values (i.e., change all f values to m and vice versa) with a single update statement and no intermediate temp table.
+
+Note that you must write a single update statement, DO NOT write any select statement for this problem.
+
+ 
+
+Example:
+
+| id | name | sex | salary |
+|----|------|-----|--------|
+| 1  | A    | m   | 2500   |
+| 2  | B    | f   | 1500   |
+| 3  | C    | m   | 5500   |
+| 4  | D    | f   | 500    |
+After running your update statement, the above salary table should have the following rows:
+| id | name | sex | salary |
+|----|------|-----|--------|
+| 1  | A    | f   | 2500   |
+| 2  | B    | m   | 1500   |
+| 3  | C    | f   | 5500   |
+| 4  | D    | m   | 500    |
+
+update salary set sex=if(sex=m,f,m)
+
+628. Maximum Product of Three Numbers
+Easy
+
+1173
+
+379
+
+Add to List
+
+Share
+Given an integer array, find three numbers whose product is maximum and output the maximum product.
+
+Example 1:
+
+Input: [1,2,3]
+Output: 6
+ 
+
+Example 2:
+
+Input: [1,2,3,4]
+Output: 24
+ 
+
+Note:
+
+The length of the given array will be in range [3,104] and all elements are in the range [-1000, 1000].
+Multiplication of any three numbers in the input won't exceed the range of 32-bit signed integer.
+
+class Solution {
+    public int maximumProduct(int[] nums) {
+    	Array.sort(nums);
+    	int i = nums.length;
+    	int a = nums[i-1]*nums[i-2]*nums[i-3];
+    	int b = nums[0]*nums[1]*nums[i-1];
+    	return Math.max(a,b);
+        int a=Integer.MIN_VALUE,b=Integer.MIN_VALUE,c=Integer.MIN_VALUE;
+        for(int i  : nums){
+        	if(i>c){
+        		c=i;
+        	}else{
+        		continue;
+        	}
+
+        	if(c>b){
+        		int t = c;
+        		c=b;
+        		b=t;
+        	}else{
+        		continue;
+        	}
+
+        	if(b>a){
+        		int t=a;
+        		a=b;
+        		b=t;
+        	}
+
+
+        }
+
+        return a*b*c;
+    }
+
+    public 
+}
+
+629. K Inverse Pairs Array
+Hard
+
+324
+
+75
+
+Add to List
+
+Share
+Given two integers n and k, find how many different arrays consist of numbers from 1 to n such that there are exactly k inverse pairs.
+
+We define an inverse pair as following: For ith and jth element in the array, if i < j and a[i] > a[j] then it's an inverse pair; Otherwise, it's not.
+
+Since the answer may be very large, the answer should be modulo 109 + 7.
+
+Example 1:
+
+Input: n = 3, k = 0
+Output: 1
+Explanation: 
+Only the array [1,2,3] which consists of numbers from 1 to 3 has exactly 0 inverse pair.
+ 
+
+Example 2:
+
+Input: n = 3, k = 1
+Output: 2
+Explanation: 
+The array [1,3,2] and [2,1,3] have exactly 1 inverse pair.
+ 
+
+Note:
+这道题给了我们1到n总共n个数字，让我们任意排列数组的顺序，使其刚好存在k个翻转对，所谓的翻转对，就是位置在前面的数字值大，而且题目中表明了结果会很大很大，要我们对一个很大的数字取余。对于这种结果巨大的题目，劝君放弃暴力破解或者是无脑递归，想都不用想，那么最先应该考虑的就是DP的解法了。我们需要一个二维的DP数组，其中dp[i][j]表示1到i的数字中有j个翻转对的排列总数，那么我们要求的就是dp[n][k]了，即1到n的数字中有k个翻转对的排列总数。现在难点就是要求递推公式了。我们想如果我们已经知道dp[n][k]了，怎么求dp[n+1][k]，先来看dp[n+1][k]的含义，是1到n+1点数字中有k个翻转对的个数，那么实际上在1到n的数字中的某个位置加上了n+1这个数，为了简单起见，我们先让n=4，那么实际上相当于要在某个位置加上5，那么加5的位置就有如下几种情况：
+
+xxxx5
+
+xxx5x
+
+xx5xx
+
+x5xxx
+
+5xxxx
+
+这里xxxx表示1到4的任意排列，那么第一种情况xxxx5不会增加任何新的翻转对，因为xxxx中没有比5大的数字，而 xxx5x会新增加1个翻转对，xx5xx，x5xxx，5xxxx分别会增加2，3，4个翻转对。那么xxxx5就相当于dp[n][k]，即dp[4][k]，那么依次往前类推，就是dp[n][k-1], dp[n][k-2]...dp[n][k-n]，这样我们就可以得出dp[n+1][k]的求法了:
+
+dp[n+1][k] = dp[n][k] + dp[n][k-1] + ... + dp[n][k - n]
+
+那么dp[n][k]的求法也就一目了然了:
+
+dp[n][k] = dp[n - 1][k] + dp[n - 1][k-1] + ... + dp[n - 1][k - n + 1]
+
+那么我们就可以写出代码如下了：
+
+ 
+
+解法一：
+
+复制代码
+class Solution {
+public:
+    int kInversePairs(int n, int k) {
+        int M = 1000000007;
+        vector<vector<int>> dp(n + 1, vector<int>(k + 1, 0));
+        dp[0][0] = 1;
+        for (int i = 0; i <= n; ++i) {
+            for (int j = 0; j < i; ++j) {
+                for (int m = 0; m <= k; ++m) {
+                    if (m - j >= 0 && m - j <= k) {
+                        dp[i][m] = (dp[i][m] + dp[i - 1][m - j]) % M;
+                    }
+                }
+            }
+        }
+        return dp[n][k];
+    }
+};
+复制代码
+ 
+
+我们可以对上面的解法进行时间上的优化，还是来看我们的递推公式: 
+
+dp[n][k] = dp[n - 1][k] + dp[n - 1][k-1] + ... + dp[n - 1][k - n + 1]
+
+我们可以用k+1代替k，得到：
+
+dp[n][k+1] = dp[n - 1][k+1] + dp[n - 1][k] + ... + dp[n - 1][k + 1 - n + 1]
+
+用第二个等式减去第一个等式可以得到：
+
+dp[n][k+1] = dp[n][k] + dp[n - 1][k+1] - dp[n - 1][k - n + 1]
+
+将k+1换回成k，可以得到：
+
+dp[n][k] = dp[n][k-1] + dp[n - 1][k] - dp[n - 1][k - n]
+
+我们可以发现当k>=n的时候，最后一项的数组坐标才能为非负数，从而最后一项才有值，所以我们再更新的时候只需要判断一下k和n的关系，如果k>=n的话，就要减去最后一项，这种递推式算起来更高效，减少了一个循环，参见代码如下：
+
+ 
+
+解法二：
+
+复制代码
+class Solution {
+public:
+    int kInversePairs(int n, int k) {
+        int M = 1000000007;
+        vector<vector<int>> dp(n + 1, vector<int>(k + 1, 0));
+        dp[0][0] = 1;
+        for (int i = 1; i <= n; ++i) {
+            dp[i][0] = 1;
+            for (int j = 1; j <= k; ++j) {
+                dp[i][j] = (dp[i - 1][j] + dp[i][j - 1]) % M;
+                if (j >= i) {
+                    dp[i][j] = (dp[i][j] - dp[i - 1][j - i] + M) % M;
+                }
+            }
+        }
+        return dp[n][k];
+    }
+};
+复制代码
+The integer n is in the range [1, 1000] and k is in the range [0, 1000].
+
+class Solution {
+    public int kInversePairs(int n, int k) {
+    	if(k==0){
+    		return 0;
+    	}
+
+
+    	int q = 1000000007;
+
+    	int[][] ii = new int[n+1][k+1];
+    	ii[0][0]=1;
+    	for(int i = 0;i<n+1;i++){
+    		for(int j=0;j<i;j++){
+    			for(int m=0;m<=k;m++){
+    				if(m-j>=0&&m-j<=k){
+    					ii[i][m]=ii[i][m]+ii[i-1][m-j];
+    				ii[i][m]%=q;
+    				}
+    				
+    			}
+    		}
+    	}
+    	return ii[n][k];
+    	ii[n][k]=ii[n-1][k]+ii[n-1][k-1]+...+ii[n-1][k-n+1];
+    	ii[n-1][k]==ii[n-2][k]+ii[n-2][k-1]+...+ii[n-2][n-k-1];
+    	ii[k+1][k]=ii[k][k]+...+ii[k][0];
+        ii[k][0]=0;
+        int[n][k]=int[n][k-1]
+        int[n-1][k]
+    }
+}
+
+630. Course Schedule III
+Hard
+
+774
+
+33
+
+Add to List
+
+Share
+There are n different online courses numbered from 1 to n. Each course has some duration(course length) t and closed on dth day. A course should be taken continuously for t days and must be finished before or on the dth day. You will start at the 1st day.
+
+Given n online courses represented by pairs (t,d), your task is to find the maximal number of courses that can be taken.
+
+Example:
+
+Input: [[100, 200], [200, 1300], [1000, 1250], [2000, 3200]]
+Output: 3
+Explanation: 
+There're totally 4 courses, but you can take 3 courses at most:
+First, take the 1st course, it costs 100 days so you will finish it on the 100th day, and ready to take the next course on the 101st day.
+Second, take the 3rd course, it costs 1000 days so you will finish it on the 1100th day, and ready to take the next course on the 1101st day. 
+Third, take the 2nd course, it costs 200 days so you will finish it on the 1300th day. 
+The 4th course cannot be taken now, since you will finish it on the 3300th day, which exceeds the closed date.
+ 
+
+Note:
+
+The integer 1 <= d, t, n <= 10,000.
+You can't take two courses simultaneously.
+Arrays.sort(c,(x,y)->{
+    		x[1]-x[0]-y[1]+y[0];
+    	});
+
+    	int[c.length+1][c[0].length+1] cc = new int[][];
+    	cc[0][0]=0;
+[[9,14],[7,12],[1,11],[4,7]]
+[[5,15],[3,19],[6,7],[2,10],[5,16],[8,14],[10,11],[2,19]]
+class Solution {
+ Arrays.sort(courses, (a, b) -> a[1] - b[1]);
+        PriorityQueue<Integer> heap = new PriorityQueue<>((a, b) -> b - a);
+        
+        int time = 0;
+        for(int[] c : courses) {
+            if(time + c[0] <= c[1]) {
+                heap.offer(c[0]);
+                time += c[0];
+            } else if(!heap.isEmpty() && heap.peek() > c[0]) {
+                time += c[0] - heap.poll();
+                heap.offer(c[0]);
+            }
+        }
+        
+        return heap.size();
+    public int scheduleCourse(int[][] c) {
+    	Array.sort(c,(x,y)->{
+    		return x[1]-y[1];
+    	});
+
+    	PriorityQueue<Integer> p = new PriorityQueue<>(Comparator.reverseOrder());
+
+    	int i = 0;
+    	for(int[] q:c){
+    		i+=q[0];
+    		p.add(q[0]);
+    		if(i>q[1]){
+    			i-=q[0];q.poll();
+    		}
+    		
+    	}
+    	return p.size();
+    	int[][][] cc = new int[c.length][c.length][3];
+    	cc[0][0]=new int[]{c[0][0],c[0][1],1};
+    	int max = 0;
+    	for(int i =1;i<c.length;i++){
+    		for(int j = 0;j<i;j++){
+    			int[] d = cc[j][0];
+    			int k = c[i][0]+d[0];
+    			int q = Math.max(c[i][1],d[1]);
+    			if(k<=q){
+    				cc[i][j]=new int[]{k,q,d[2]+1};
+    			}
+    			max=Math.max(d[2]+1,max);
+    		}
+    	}
+    	return max;
+    	Arrays.sort(c,(x,y)->{
+    		if(x[0]+y[0]<x[1]&&x[0]+y[0]<y[1]){
+    			return x[0]-y[0];
+    		}
+    		
+    		return x[1]-x[0]-y[1]+y[0];
+    	});
+
+       return q(c,0,0);
+    }
+
+
+    public int q(int[][] c,int s,int j){
+    	int max = 0;
+    	for(int i = j;i<c.length;i++){
+    		if(s<c[i][1]-c[i][0]){
+    			int q=q(c,s+c[i][0],i+1);
+    			max=Math.max(max,q+1);
+    		}
+
+    	}
+    	return max;
+
+    }
+
+     public int scheduleCourse(int[][] c) {
+
+       return q(c,0,new boolean[c.length]);
+    }
+
+    public void q(int[][] c,int s,boolean[] b){
+    	int max = 0;
+    	for(int i=0;i<b.length;i++){
+    		if(!b[i]){
+    			if(s<c[i][1]-c[i][0]){
+    				b[i]=true;
+    				int q=q(c,s+c[i][0],b);
+    				b[i]=false;
+    				    			max=Math.max(max,q+1);
+
+    			}
+    		}
+    	}
+    	return max;
+    }
+}
+
+
+632. Smallest Range Covering Elements from K Lists
+Hard
+
+1112
+
+25
+
+Add to List
+
+Share
+You have k lists of sorted integers in ascending order. Find the smallest range that includes at least one number from each of the k lists.
+
+We define the range [a,b] is smaller than range [c,d] if b-a < d-c or a < c if b-a == d-c.
+
+ 
+
+Example 1:
+
+Input: [[4,10,15,24,26], [0,9,12,20], [5,18,22,30]]
+Output: [20,24]
+Explanation: 
+List 1: [4, 10, 15, 24,26], 24 is in range [20,24].
+List 2: [0, 9, 12, 20], 20 is in range [20,24].
+List 3: [5, 18, 22, 30], 22 is in range [20,24].
+ 
+
+Note:
+
+The given list may contain duplicates, so ascending order means >= here.
+1 <= k <= 3500
+-105 <= value of elements <= 105.
+
+class Solution {
+    public int[] smallestRange(List<List<Integer>> nums) {
+    	if(nums.size()==1)return new int[]{nums.get(0).get(0),nums.get(0).get(0)};
+    	List<int[]> list = new ArrayList<>();
+
+    	for(int i = 0;i<nums.size();i++){
+    		for(int j=0;j<nums.get(i).size();j++){
+    			list.add(new int[]{nums.get(i).get(j),i});
+    		}
+    	}
+
+    	Collections.sort(list,(x,y)->{
+    		return x[0]-y[0];
+    	});
+
+    	int l=0,r=0,c=0;
+    	int[] q = new int[2];
+    	int min = Integer.MAX_VALUE;
+    	Map<Integer,Integer> map = new HashMap<>();
+    	while(r<list.size()){
+    		
+    			int[] ii = list.get(r);
+    			int i = map.getOrDefault(ii[1],0);
+    			if(i==0){
+    				c++;
+    			}
+
+    			map.put(ii[1],i+1);
+    			while(c==nums.size()&&r>l){
+    				int[] jj = list.get(l);
+    				i=map.get(jj[1]);
+    				map.put(jj[1],i-1);
+    				l++;
+    				if(i==1){
+    					c--;
+    					if(min>ii[0]-jj[0]){
+    						min= ii[0]-jj[0];
+    						q[0]=jj[0];
+    					q[1]=ii[0];
+    					}
+    					
+    					break;
+
+    				}
+    			}
+    		r++;
+    	}
+    	return q;
+    	
+        
+    }
+}
+
+633. Sum of Square Numbers
+Easy
+
+559
+
+339
+
+Add to List
+
+Share
+Given a non-negative integer c, your task is to decide whether there're two integers a and b such that a2 + b2 = c.
+
+Example 1:
+
+Input: 5
+Output: True
+Explanation: 1 * 1 + 2 * 2 = 5
+ 
+
+Example 2:
+
+Input: 3
+Output: False
+
+class Solution {
+    public boolean judgeSquareSum(int c) {
+    	int q = (int)Math.sqrt(c);
+    	int w = 0;
+    	while(q>w){
+    		int t=q*q+w*w;
+    		if(t==c){
+    			return true;
+    		}
+
+    		if(t>c){
+    			q--;
+    		}else{
+    			w++;
+    		}
+    	}
+    	return false;
+    	for(int i = 1;i<q;i++){
+
+    	}        
+    }
+}
+
+636. Exclusive Time of Functions
+Medium
+
+827
+
+1523
+
+Add to List
+
+Share
+On a single threaded CPU, we execute some functions.  Each function has a unique id between 0 and N-1.
+
+We store logs in timestamp order that describe when a function is entered or exited.
+
+Each log is a string with this format: "{function_id}:{"start" | "end"}:{timestamp}".  For example, "0:start:3" means the function with id 0 started at the beginning of timestamp 3.  "1:end:2" means the function with id 1 ended at the end of timestamp 2.
+
+A function's exclusive time is the number of units of time spent in this function.  Note that this does not include any recursive calls to child functions.
+
+The CPU is single threaded which means that only one function is being executed at a given time unit.
+
+Return the exclusive time of each function, sorted by their function id.
+
+ 
+
+Example 1:
+
+
+
+Input:
+n = 2
+logs = ["0:start:0","1:start:2","1:end:5","0:end:6"]
+Output: [3, 4]
+Explanation:
+Function 0 starts at the beginning of time 0, then it executes 2 units of time and reaches the end of time 1.
+Now function 1 starts at the beginning of time 2, executes 4 units of time and ends at time 5.
+Function 0 is running again at the beginning of time 6, and also ends at the end of time 6, thus executing for 1 unit of time. 
+So function 0 spends 2 + 1 = 3 units of total time executing, and function 1 spends 4 units of total time executing.
+ 
+
+Note:
+1
+["0:start:0","0:start:2","0:end:5","0:start:6","0:end:6","0:end:7"]
+1 <= n <= 100
+Two functions won't start or end at the same time.
+Functions will always log when they exit.
+1
+["0:start:0","0:start:2","0:end:5","0:start:6","0:end:6","0:end:7"]
+class Solution {
+    public int[] exclusiveTime(int n, List<String> logs) {
+    	Stack<Integer> stack = new Stack<>();
+    	int[] ii = new int[n];
+    	int p = 0;
+    	for(String s : logs){
+    		String[] ss = s.split(":");
+    		String t = ss[1];
+    		int w = Integer.parseInt(ss[2]);
+    		int q = Integer.parseInt(ss[0]);
+    		int z = w - p;
+			p=w;
+    		if(t.equals("start")){
+    			int i=q;
+    			if(stack.isEmpty()){
+    				i = stack.peek();
+    			}
+    			stack.push(q);
+    			ii[i]+=z;
+    			
+    		}else{
+    			int i =stack.pop();
+    			ii[i]+=z+1;
+    			p++;
+    		}
+
+    	}
+        return ii;
+    }
+}
+
+637. Average of Levels in Binary Tree
+Easy
+
+1380
+
+168
+
+Add to List
+
+Share
+Given a non-empty binary tree, return the average value of the nodes on each level in the form of an array.
+Example 1:
+Input:
+    3
+   / \
+  9  20
+    /  \
+   15   7
+Output: [3, 14.5, 11]
+Explanation:
+The average value of nodes on level 0 is 3,  on level 1 is 14.5, and on level 2 is 11. Hence return [3, 14.5, 11].
+Note:
+The range of node's value is in the range of 32-bit signed integer.
+
+class Solution {
+    public List<Double> averageOfLevels(TreeNode root) {
+        List<long[]> list =new ArrayList<>();
+        q(root,list,0);
+        List<Double> r = new ArrayList<>();
+        for(long[] ii : list){
+        	r.add(ii[0]*1d/ii[1]);
+        }
+        return r;
+
+    }
+
+    public void q(TreeNode root,List<long[]> list,int i){
+    	if(root==null){
+    		return;
+    	}
+    	if(list.size()==i){
+    		list.add(new ling[]{0,0});
+    	}
+
+    	long[] ii = list.get(i);
+    	ii[0]+=root.val;
+    	ii[1]++;
+    	q(root.left,list,i+1);
+    	q(root.right,list,i+1);
+    }
+
+    public List<Double> averageOfLevels(TreeNode root) {
+        List<Double> list =new ArrayList<>();
+        q(root,list,0);
+        List<Double> r = new ArrayList<>();
+        for(int[] ii : list){
+        	r.add(ii[0]*1d/ii[1]);
+        }
+        return r;
+
+    }
+
+    public void q(TreeNode root,List<Double> list,int i){
+    	if(root==null){
+    		return;
+    	}
+
+
+    	if(list.size()==i){
+    		list.add(0d);
+    	}
+
+    	list.set(i,lis)
+    	int[] ii = list.get(i);
+    	ii[0]+=root.val;
+    	ii[1]++;
+    	q(root.left,list,i+1);
+    	q(root.right,list,i+1);
+    }
+}
+
+638. Shopping Offers
+Medium
+
+576
+
+465
+
+Add to List
+
+Share
+In LeetCode Store, there are some kinds of items to sell. Each item has a price.
+
+However, there are some special offers, and a special offer consists of one or more different kinds of items with a sale price.
+
+You are given the each item's price, a set of special offers, and the number we need to buy for each item. The job is to output the lowest price you have to pay for exactly certain items as given, where you could make optimal use of the special offers.
+
+Each special offer is represented in the form of an array, the last number represents the price you need to pay for this special offer, other numbers represents how many specific items you could get if you buy this offer.
+
+You could use any of special offers as many times as you want.
+
+Example 1:
+Input: [2,5], [[3,0,5],[1,2,10]], [3,2]
+Output: 14
+Explanation: 
+There are two kinds of items, A and B. Their prices are $2 and $5 respectively. 
+In special offer 1, you can pay $5 for 3A and 0B
+In special offer 2, you can pay $10 for 1A and 2B. 
+You need to buy 3A and 2B, so you may pay $10 for 1A and 2B (special offer #2), and $4 for 2A.
+Example 2:
+Input: [2,3,4], [[1,1,0,4],[2,2,1,9]], [1,2,1]
+Output: 11
+Explanation: 
+The price of A is $2, and $3 for B, $4 for C. 
+You may pay $4 for 1A and 1B, and $9 for 2A ,2B and 1C. 
+You need to buy 1A ,2B and 1C, so you may pay $4 for 1A and 1B (special offer #1), and $3 for 1B, $4 for 1C. 
+You cannot add more items, though only $9 for 2A ,2B and 1C.
+Note:
+There are at most 6 kinds of items, 100 special offers.
+For each item, you need to buy at most 6 of them.
+You are not allowed to buy more items than you want, even if that would lower the overall price.
+for(List<Integer> s : special){
+
+	for(int i=0;i<s.size();i++){
+
+	}
+}
+[2,3,4]
+[[1,1,0,4],[2,2,1,9]]
+[1,2,1]
+class Solution {
+    public int shoppingOffers(List<Integer> price, List<List<Integer>> special, List<Integer> needs) {
+        int min = 0;
+        for(int i = 0;i<price.size();i++){
+        	min+=price.get(i)*needs.get(i);
+        }
+
+        for(List<Integer> s : special){
+			int q = s.get(s.size()-1);
+			if(q>=min)continue;
+			List<Integer> next = new ArrayList<>();
+			int b = 0;
+			for(int i=0;i<s.size()-1;i++){
+				int j = needs.get(i)-s.get(i);
+				if(j<0){
+					b=-1;
+					break;
+				}
+				if(j>0)b=1;
+				next.add(j);
+			}
+
+			if(b==-1){
+				continue;
+			}
+
+			if(b==1){
+				q+=shoppingOffers(price,special,next);
+			}
+			min=Math.min(min,q);
+		}
+		return min;
+    }
+}
+
+639. Decode Ways II
+Hard
+
+455
+
+521
+
+Add to List
+
+Share
+A message containing letters from A-Z is being encoded to numbers using the following mapping way:
+
+'A' -> 1
+'B' -> 2
+...
+'Z' -> 26
+Beyond that, now the encoded string can also contain the character '*', which can be treated as one of the numbers from 1 to 9.
+
+Given the encoded message containing digits and the character '*', return the total number of ways to decode it.
+
+Also, since the answer may be very large, you should return the output mod 109 + 7.
+
+Example 1:
+Input: "*"
+Output: 9
+Explanation: The encoded message can be decoded to the string: "A", "B", "C", "D", "E", "F", "G", "H", "I".
+Example 2:
+Input: "1*"
+Output: 9 + 9 = 18
+Note:
+The length of the input string will fit in range [1, 105].
+The input string will only contain the character '*' and digits '0' - '9'.
+
+
+这道解码的题是之前那道Decode Ways的拓展，难度提高了不少，引入了星号，可以代表1到9之间的任意数字，是不是有点外卡匹配的感觉。有了星号以后，整个题就变得异常的复杂，所以结果才让我们对一个很大的数求余，避免溢出。这道题的难点就是要分情况种类太多，一定要全部理通顺才行。我们还是用DP来做，建立一个一维dp数组，其中dp[i]表示前i个字符的解码方法等个数，长度为字符串的长度加1。将dp[0]初始化为1，然后我们判断，如果字符串第一个字符是0，那么直接返回0，如果是*，则dp[1]初始化为9，否则初始化为1。下面就来计算一般情况下的dp[i]了，我们从i=2开始遍历，由于要分的情况种类太多，我们先选一个大分支，就是当前遍历到的字符s[i-1]，只有三种情况，要么是0，要么是1到9的数字，要么是星号。我们一个一个来分析：
+
+首先来看s[i-1]为0的情况，这种情况相对来说比较简单，因为0不能单独拆开，只能跟前面的数字一起，而且前面的数字只能是1或2，其他的直接返回0即可。那么当前面的数字是1或2的时候，dp[i]的种类数就跟dp[i-2]相等，可以参见之前那道Decode Ways的讲解，因为后两数无法单独拆分开，就无法产生新的解码方法，所以只保持住原来的拆分数量就不错了；如果前面的数是星号的时候，那么前面的数可以为1或者2，这样就相等于两倍的dp[i-2]；如果前面的数也为0，直接返回0即可。
+
+再来看s[i-1]为1到9之间的数字的情况，首先搞清楚当前数字是可以单独拆分出来的，那么dp[i]至少是等于dp[i-1]的，不会拖后腿，还要看其能不能和前面的数字组成两位数进一步增加解码方法。那么就要分情况讨论前面一个数字的种类，如果当前数字可以跟前面的数字组成一个小于等于26的两位数的话，dp[i]还需要加上dp[i-2]；如果前面的数字为星号的话，那么要看当前的数字是否小于等于6，如果是小于等于6，那么前面的数字就可以是1或者2了，此时dp[i]需要加上两倍的dp[i-2]，如果大于6，那么前面的数字只能是1，所以dp[i]只能加上dp[i-2]。
+
+最后来看s[i-1]为星号的情况，如果当前数字为星号，那么就创造9种可以单独拆分的方法，所以那么dp[i]至少是等于9倍的dp[i-1]，还要看其能不能和前面的数字组成两位数进一步增加解码方法。那么就要分情况讨论前面一个数字的种类，如果前面的数字是1，那么当前的9种情况都可以跟前面的数字组成两位数，所以dp[i]需要加上9倍的dp[i-2]；如果前面的数字是2，那么只有小于等于6的6种情况都可以跟前面的数字组成两位数，所以dp[i]需要加上6倍的dp[i-2]；如果前面的数字是星号，那么就是上面两种情况的总和，dp[i]需要加上15倍的dp[i-2]。
+
+ int n = s.size(), M = 1e9 + 7;
+        vector<long> dp(n + 1, 0);
+        dp[0] = 1;
+        if (s[0] == '0') return 0;
+        dp[1] = (s[0] == '*') ? 9 : 1;
+        for (int i = 2; i <= n; ++i) {
+            if (s[i - 1] == '0') {
+                if (s[i - 2] == '1' || s[i - 2] == '2') {
+                    dp[i] += dp[i - 2];
+                } else if (s[i - 2] == '*') {
+                    dp[i] += 2 * dp[i - 2];
+                } else {
+                    return 0;
+                }
+            } else if (s[i - 1] >= '1' && s[i - 1] <= '9') {
+                dp[i] += dp[i - 1];
+                if (s[i - 2] == '1' || (s[i - 2] == '2' && s[i - 1] <= '6')) {
+                    dp[i] += dp[i - 2];
+                } else if (s[i - 2] == '*') {
+                    dp[i] += (s[i - 1] <= '6') ? (2 * dp[i - 2]) : dp[i - 2];
+                }
+            } else { // s[i - 1] == '*'
+                dp[i] += 9 * dp[i - 1];
+                if (s[i - 2] == '1') dp[i] += 9 * dp[i - 2];
+                else if (s[i - 2] == '2') dp[i] += 6 * dp[i - 2];
+                else if (s[i - 2] == '*') dp[i] += 15 * dp[i - 2];
+            }
+            dp[i] %= M;
+        }
+        return dp[n];
+class Solution {
+    public int numDecodings(String s) {
+        
+    }
+}
+
+640. Solve the Equation
+Medium
+
+244
+
+545
+
+Add to List
+
+Share
+Solve a given equation and return the value of x in the form of string "x=#value". The equation contains only '+', '-' operation, the variable x and its coefficient.
+
+If there is no solution for the equation, return "No solution".
+
+If there are infinite solutions for the equation, return "Infinite solutions".
+
+If there is exactly one solution for the equation, we ensure that the value of x is an integer.
+
+Example 1:
+Input: "x+5-3+x=6+x-2"
+Output: "x=2"
+Example 2:
+Input: "x=x"
+Output: "Infinite solutions"
+Example 3:
+Input: "2x=x"
+Output: "x=0"
+Example 4:
+Input: "2x+3x-6x=x+2"
+Output: "x=-1"
+Example 5:
+Input: "x=x+2"
+Output: "No solution"
+
+class Solution {
+    public String solveEquation(String equation) {
+        String[] qq = equation.split("=");
+        int[] ii = new int[]{0,0};
+        w(qq[0].charAt(0)=='-':"0"+qq[0]:qq[0],ii,true);
+        w(q[1].charAt(0)=='-':"0"+qq[1]:qq[1],ii,false);
+       	if(ii[0]==0){
+       		if(ii[1]==0){
+       			return "Infinite solutions";
+       		}else{
+       			return "No solution";
+       		}
+       	}
+
+       	return "x="+ii[1]/ii[0];
+    }
+
+    public void w(String s,int [] ii,boolean b){
+    	 int i = 0;
+        boolean k = b;
+        while(i<s.length()){
+        	int j=getNext(s,i);
+        	int r = 0;
+
+        	if(s.charAt(j-1)=='x'){
+        		if(j-i==1){
+        			r=1;
+        		}else{
+        		    r=Integer.parseInt(s.substring(i,j-1));
+	
+        		}
+        		q(ii,0,r,k);
+        	}else{
+        		r=Integer.parseInt(s.substring(i,j));
+        		q(ii,1,r,!k);
+        	}
+
+
+if(j<s.length()){
+        	if(s.charAt(j)=='+'){
+        		k=b;
+        	}else{
+        		k=!b;
+        	}
+        	}
+        	
+        	i=j+1;
+
+        }
+
+    }
+
+    public void q(int[] ii,int i,int r,boolean b){
+    	if(b){
+    		ii[i]+=r;
+    	}else{
+    		ii[i]-=r;
+    	}
+    }
+
+    public int getNext(String s,int i){
+    	char c = s.charAt(i);
+    	while(c!='-'&&c!='+'){
+    		i++;
+    		if(i==s.length()){
+    			break;
+    		}
+    		c=s.charAt(i);
+    	}
+    	return i;
+    }
+}
+
+641. Design Circular Deque
+Medium
+
+279
+
+41
+
+Add to List
+
+Share
+Design your implementation of the circular double-ended queue (deque).
+
+Your implementation should support following operations:
+
+MyCircularDeque(k): Constructor, set the size of the deque to be k.
+insertFront(): Adds an item at the front of Deque. Return true if the operation is successful.
+insertLast(): Adds an item at the rear of Deque. Return true if the operation is successful.
+deleteFront(): Deletes an item from the front of Deque. Return true if the operation is successful.
+deleteLast(): Deletes an item from the rear of Deque. Return true if the operation is successful.
+getFront(): Gets the front item from the Deque. If the deque is empty, return -1.
+getRear(): Gets the last item from Deque. If the deque is empty, return -1.
+isEmpty(): Checks whether Deque is empty or not. 
+isFull(): Checks whether Deque is full or not.
+ 
+
+Example:
+
+MyCircularDeque circularDeque = new MycircularDeque(3); // set the size to be 3
+circularDeque.insertLast(1);			// return true
+circularDeque.insertLast(2);			// return true
+circularDeque.insertFront(3);			// return true
+circularDeque.insertFront(4);			// return false, the queue is full
+circularDeque.getRear();  			// return 2
+circularDeque.isFull();				// return true
+circularDeque.deleteLast();			// return true
+circularDeque.insertFront(4);			// return true
+circularDeque.getFront();			// return 4
+ 
+
+Note:
+
+All values will be in the range of [0, 1000].
+The number of operations will be in the range of [1, 1000].
+Please do not use the built-in Deque library.
+
+class MyCircularDeque {
+	class Node{
+		Node next ;
+		int val;
+		public Node(int val){
+			this.val = val;
+		}
+	}
+
+	Node f;
+	Node l;
+	int size = 0;
+	int length;
+	int[] ii;
+
+    /** Initialize your data structure here. Set the size of the deque to be k. */
+    public MyCircularDeque(int k) {
+        ii=new int[k];
+    }
+    
+    /** Adds an item at the front of Deque. Return true if the operation is successful. */
+    public boolean insertFront(int value) {
+        if(size<ii.length){
+        	Node n = new Node(value);
+        	if(f==null){
+        		f=n;
+        		l=n;
+        	}else{
+        		f.next=n;
+        		f=n;
+        	}
+
+        	size++;
+        	return true;
+        }
+        return false;
+    }
+    
+    /** Adds an item at the rear of Deque. Return true if the operation is successful. */
+    public boolean insertLast(int value) {
+         if(size<ii.length){
+         	Node n = new Node(value);
+         	if(l==null){
+         		f=n;
+        		l=n;
+         	}else{
+         		n.next=l;
+         		l=n;
+         	}
+         	size++;
+        	return true;
+        }
+        return false;
+    }
+    
+    /** Deletes an item from the front of Deque. Return true if the operation is successful. */
+    public boolean deleteFront() {
+        if(size==0){
+        	return false;
+        }
+        
+        if(size==1){
+        	l=null;
+        	f=null;
+        }else{
+			Node k = l;
+		    while(k.next!=f){
+	        	k=k.next;
+	        }
+        	k.next=null;
+        	f=k;
+        }
+        size--;
+        return true;
+    }
+    
+    /** Deletes an item from the rear of Deque. Return true if the operation is successful. */
+    public boolean deleteLast() {
+        if(size==0){
+        	return false;
+        }
+        
+        if(size==1){
+        	l=null;
+        	f=null;
+        }else{
+			l=l.next;
+        }
+        size--;
+        return true;
+    }
+    
+    /** Get the front item from the deque. */
+    public int getFront() {
+        if(size==0){
+        	return -1;
+        }
+
+        return f.val;
+    }
+    
+    /** Get the last item from the deque. */
+    public int getRear() {
+    	if(size==0){
+    		return -1;
+    	}
+
+    	return l.val;
+        
+    }
+    
+    /** Checks whether the circular deque is empty or not. */
+    public boolean isEmpty() {
+        return size==0;
+    }
+    
+    /** Checks whether the circular deque is full or not. */
+    public boolean isFull() {
+        return size==ii.length;
+    }
+}
+
+/**
+ * Your MyCircularDeque object will be instantiated and called as such:
+ * MyCircularDeque obj = new MyCircularDeque(k);
+ * boolean param_1 = obj.insertFront(value);
+ * boolean param_2 = obj.insertLast(value);
+ * boolean param_3 = obj.deleteFront();
+ * boolean param_4 = obj.deleteLast();
+ * int param_5 = obj.getFront();
+ * int param_6 = obj.getRear();
+ * boolean param_7 = obj.isEmpty();
+ * boolean param_8 = obj.isFull();
+ */
+
+ 643. Maximum Average Subarray I
+Easy
+
+773
+
+121
+
+Add to List
+
+Share
+Given an array consisting of n integers, find the contiguous subarray of given length k that has the maximum average value. And you need to output the maximum average value.
+
+Example 1:
+
+Input: [1,12,-5,-6,50,3], k = 4
+Output: 12.75
+Explanation: Maximum average is (12-5-6+50)/4 = 51/4 = 12.75
+ 
+
+Note:
+
+1 <= k <= n <= 30,000.
+Elements of the given array will be in the range [-10,000, 10,000].
+
+class Solution {
+    public double findMaxAverage(int[] nums, int k) {
+        int sum = 0;
+        int max = Integer.MIN_VALUE;
+        for(int i =0;i<k;i++){
+        	sum+=nums[i];
+        }
+        max=sum;
+
+        for(int i=k;i<nums.length;i++){
+        	sum+=nums[i]-nums[i-k];
+        	max=Math.max(max,sum);
+        }
+        return max*1.0d/k;
+
+    }
+}
+
+645. Set Mismatch
+Easy
+
+703
+
+314
+
+Add to List
+
+Share
+The set S originally contains numbers from 1 to n. But unfortunately, due to the data error, one of the numbers in the set got duplicated to another number in the set, which results in repetition of one number and loss of another number.
+
+Given an array nums representing the data status of this set after the error. Your task is to firstly find the number occurs twice and then find the number that is missing. Return them in the form of an array.
+
+Example 1:
+Input: nums = [1,2,2,4]
+Output: [2,3]
+Note:
+The given array size will in the range [2, 10000].
+The given array's numbers won't have any order.
+
+class Solution {
+    public int[] findErrorNums(int[] nums) {
+    	int[] jj =new int[nums.length];
+        int[] ii =new int[2];
+        for(int i = 0;i<nums.length;i++){
+        	if(jj[nums[i]-1]==1){
+        		ii[0]=nums[i];
+        	}
+        	jj[nums[i]-1]=1;
+        }
+
+        for(int i = 0;i<nums.length;i++){
+        	if(jj[i]==0){
+        		ii[1]=i+1;
+        		break;
+        	}
+        }
+        return ii;
+    }
+}
+
+646. Maximum Length of Pair Chain
+Medium
+
+1013
+
+83
+
+Add to List
+
+Share
+You are given n pairs of numbers. In every pair, the first number is always smaller than the second number.
+
+Now, we define a pair (c, d) can follow another pair (a, b) if and only if b < c. Chain of pairs can be formed in this fashion.
+
+Given a set of pairs, find the length longest chain which can be formed. You needn't use up all the given pairs. You can select pairs in any order.
+[[-1,1],[-2,7],[-5,8],[-3,8],[1,3],[-2,9],[-5,2]]
+Example 1:
+Input: [[1,2], [2,3], [3,4]]
+Output: 2
+Explanation: The longest chain is [1,2] -> [3,4]
+Note:
+The number of given pairs will be in the range [1, 1000].
+[[-6,9],[1,6],[8,10],[-1,4],[-6,-2],[-9,8],[-5,3],[0,3]]
+class Solution {
+    public int findLongestChain(int[][] pairs) {
+    	//if(pairs.length<2)return pairs.length;
+
+    	Arrays.sort(pairs,(x,y)->{
+    		return x[1]-y[1];
+    	});
+
+    	int max = 1;
+    	int p = pairs[0][1];
+    	for(int i = 1;i<pairs.length;i++){
+    		if(pairs[i][0]>p){
+    			max++;
+    			p=pairs[i][1];
+    		}
+
+    	}
+    	return max;
+    	Arrays.sort(pairs,(x,y)->{
+    		if(x[1]<y[0]){
+    			return x[1]-y[0];
+    		}
+
+    		return x[1]-y[1];
+    		return x[0]==y[0]?x[0]-y[1]:x[0]-y[0];
+    		
+    	});
+
+
+    	int[] ii = new int[pairs.length];
+    	ii[0]=1;
+    	int max=0;
+    	for(int i = 1;i<pairs.length;i++){
+    		int[] q=pairs[i];
+    		for(int j=0;j<i;j++){
+    			int[] w = pairs[j];
+    			if(q[0]>w[1]){
+    				ii[i]=Math.max(ii[i],ii[j]+1);
+    				max=Math.max(ii[i],max);
+    			}
+    		}
+    	}
+
+    	return max;
+        int max = pairs[0][1];
+        for(int[] ii:pairs){
+        	if(max>=ii[1]){
+        		max=ii[1];
+        	}
+        }
+    }
+}
+
+
+647. Palindromic Substrings
+Medium
+
+2940
+
+121
+
+Add to List
+
+Share
+Given a string, your task is to count how many palindromic substrings in this string.
+
+The substrings with different start indexes or end indexes are counted as different substrings even they consist of same characters.
+
+Example 1:
+
+Input: "abc"
+Output: 3
+Explanation: Three palindromic strings: "a", "b", "c".
+ 
+
+Example 2:
+
+Input: "aaa"
+Output: 6
+Explanation: Six palindromic strings: "a", "a", "a", "aa", "aa", "aaa".
+ 
+
+Note:
+
+The input string length won't exceed 1000.
+
+class Solution {
+    public int countSubstrings(String s) {
+    	int max = 0;
+
+    	for(int i =0;i<s.length();i++){
+    		max+=q(s,i,i);
+    		max+=q(s,i,i+1);
+    	}
+
+    	return max;
+
+
+    }
+
+    public int q(String s,int l,int r){
+    	int c = 0;
+    	while(l>-1&&r<s.length()&&s.charAt(l)==s.charAt(r)){
+    		c++;
+    		l--;
+    		r++;
+    	}
+    	return c;
+    }
+}
+if(s==null)return 0;
+    	int[][] ii = new int[s.length()][s.length()];
+    	
+        int max = 0;
+        for(int i=0;i<s.length();i++){
+        	ii[i][i]++;
+        	max++;
+            if(i-1>-1&&s.charAt(i-1)==s.charAt(i)){
+        		ii[i-1][i]++;
+        		max++;
+        	}
+        	for(int j = 1;i-j>0;j++){
+        		if(ii[i-j][i-1]>0&&s.charAt(i-j-1)==s.charAt(i)){
+        			ii[i-j-1][i]++;
+        			max++;
+        		}
+        	}
+        }
+
+        return max;
+648. Replace Words
+Medium
+
+773
+
+131
+
+Add to List
+
+Share
+In English, we have a concept called root, which can be followed by some other word to form another longer word - let's call this word successor. For example, when the root "an" is followed by the successor word "other", we can form a new word "another".
+
+Given a dictionary consisting of many roots and a sentence consisting of words separated by spaces, replace all the successors in the sentence with the root forming it. If a successor can be replaced by more than one root, replace it with the root that has the shortest length.
+
+Return the sentence after the replacement.
+
+ 
+
+Example 1:
+
+Input: dictionary = ["cat","bat","rat"], sentence = "the cattle was rattled by the battery"
+Output: "the cat was rat by the bat"
+Example 2:
+
+Input: dictionary = ["a","b","c"], sentence = "aadsfasf absbs bbab cadsfafs"
+Output: "a a b c"
+Example 3:
+
+Input: dictionary = ["a", "aa", "aaa", "aaaa"], sentence = "a aa a aaaa aaa aaa aaa aaaaaa bbb baba ababa"
+Output: "a a a a a a a a bbb baba a"
+Example 4:
+
+Input: dictionary = ["catt","cat","bat","rat"], sentence = "the cattle was rattled by the battery"
+Output: "the cat was rat by the bat"
+Example 5:
+
+Input: dictionary = ["ac","ab"], sentence = "it is abnormal that this solution is accepted"
+Output: "it is ab that this solution is ac"
+ 
+
+Constraints:
+
+1 <= dictionary.length <= 1000
+1 <= dictionary[i].length <= 100
+dictionary[i] consists of only lower-case letters.
+1 <= sentence.length <= 10^6
+sentence consists of only lower-case letters and spaces.
+The number of words in sentence is in the range [1, 1000]
+The length of each word in sentence is in the range [1, 1000]
+Each two consecutive words in sentence will be separated by exactly one space.
+sentence does not have leading or trailing spaces.
+ class TrieNode {
+        TrieNode[] children;
+        String word;
+        
+        public TrieNode() {
+            children = new TrieNode[26];
+            word = null;
+        }
+    }
+    
+    public String replaceWords(List<String> dictionary, String sentence) {
+        TrieNode root = new TrieNode();
+        for (String s : dictionary) {
+            TrieNode node = root;
+            for (char c : s.toCharArray()) {
+                if (node.children[c - 'a'] == null) node.children[c - 'a'] = new TrieNode();
+                node = node.children[c - 'a'];
+            }
+            node.word = s;
+        }
+        StringBuilder result = new StringBuilder();
+        String[] words = sentence.split(" ");
+        for (String word : words) {
+            TrieNode node = root;
+            for (char c : word.toCharArray()) {
+                if (node.word != null || node.children[c - 'a'] == null) break;
+                node = node.children[c - 'a'];
+            }
+            if (node.word != null) {
+                result.append(node.word);
+            } else {
+                result.append(word);
+            }
+            result.append(' ');
+        }
+        result.deleteCharAt(result.length() - 1);
+        return result.toString();
+    }
+class Solution {
+
+class Tnode{
+	Tnode[] nodes=new Tnode[26];
+	String word;
+}
+
+public String replaceWords(List<String> dd, String str) {
+	Tnode root = new Tnode;
+	for(String s: dd){
+		Tnode node = root;
+		for(char c : s.toCharArray()){
+			if(node.nodes[c-'a']==null)node.nodes[c-'a']=new Tnode();
+			node = node.nodes[c-'a'];
+		}
+		node.word=s;
+	}
+
+	StringBuilder sb = new StringBuilder();
+	for(String s:str.split(" ")){
+		node=root;
+		for(char c:s.toCharArray()){
+			if(node.word!=null||node.nodes[c-'a']==null)break;
+			node=node.nodes[c-'a'];
+		}
+
+		if(node.word!=null){
+			sb.append(node.word);
+		}else{
+			sb.append(s);
+		}
+		sb.append(" ");
+	}
+	return sb.substring(0,sb.length()-1);
+}
+    public String replaceWords(List<String> dictionary, String sentence) {
+    	dictionary.sort((x,y)->{
+    		return x.length()-y.length();
+    	});
+
+    	String s = "";
+    	for(String q : sentence.split(" ")){
+    		String e = q;
+    		for(String w : dictionary){
+    			if(q.length()<w.length()){
+    				break;
+    			}
+    			boolean b = true;
+    			for(int i = 0;i<w.length();i++){
+    				if(q.charAt(i)!=w.charAt(i)){
+    					b=false;
+    					break;
+    				}
+    			}
+    			if(b){
+    				e=w;
+    				break;
+    			}
+    		}
+    		s+=e+" ";
+    	}
+
+    	return s.substring(0,s.length()-1);
+        
+    }
+}
+
+
+649. Dota2 Senate
+Medium
+
+285
+
+221
+
+Add to List
+
+Share
+In the world of Dota2, there are two parties: the Radiant and the Dire.
+
+The Dota2 senate consists of senators coming from two parties. Now the senate wants to make a decision about a change in the Dota2 game. The voting for this change is a round-based procedure. In each round, each senator can exercise one of the two rights:
+
+Ban one senator's right:
+A senator can make another senator lose all his rights in this and all the following rounds.
+Announce the victory:
+If this senator found the senators who still have rights to vote are all from the same party, he can announce the victory and make the decision about the change in the game.
+ 
+
+Given a string representing each senator's party belonging. The character 'R' and 'D' represent the Radiant party and the Dire party respectively. Then if there are n senators, the size of the given string will be n.
+
+The round-based procedure starts from the first senator to the last senator in the given order. This procedure will last until the end of voting. All the senators who have lost their rights will be skipped during the procedure.
+
+Suppose every senator is smart enough and will play the best strategy for his own party, you need to predict which party will finally announce the victory and make the change in the Dota2 game. The output should be Radiant or Dire.
+
+Example 1:
+
+Input: "RD"
+Output: "Radiant"
+Explanation: The first senator comes from Radiant and he can just ban the next senator's right in the round 1. 
+And the second senator can't exercise any rights any more since his right has been banned. 
+And in the round 2, the first senator can just announce the victory since he is the only guy in the senate who can vote.
+ 
+
+Example 2:
+
+Input: "RDD"
+Output: "Dire"
+Explanation: 
+The first senator comes from Radiant and he can just ban the next senator's right in the round 1. 
+And the second senator can't exercise any rights anymore since his right has been banned. 
+And the third senator comes from Dire and he can ban the first senator's right in the round 1. 
+And in the round 2, the third senator can just announce the victory since he is the only guy in the senate who can vote.
+
+
+Note:
+
+The length of the given string will in the range [1, 10,queue].
+
+class Solution {
+    public String predictPartyVictory(String senate) {
+    	int l = senate.length();
+    	Queue<Integer> q = new LinkHashQueue<>();
+    	Queue<Integer> w = new LinkHashQueue<>();
+    	for(int i = 0;i<l;i++){
+    		if(senate.charAt(i)=='R'){
+    			q.add(i);
+    		}else{
+    			w.add(i);
+    		}
+    	}
+
+    	while(!q.isEmpty()&&!w.isEmpty()){
+    		int qq = q.poll();
+    		int ww = w.poll();
+    		if(qq>ww){
+    		w.add(ww+l);
+    		}else{
+    		q.add(qq+l);
+    		}
+    		qq>ww?w.add(ww+l):q.add(qq+l);
+    	}
+        return q.isEmpty()?"Dire":"Radiant";
+    }
+}
+
+650. 2 Keys Keyboard
+Medium
+
+1352
+
+97
+
+Add to List
+
+Share
+Initially on a notepad only one character 'A' is present. You can perform two operations on this notepad for each step:
+
+Copy All: You can copy all the characters present on the notepad (partial copy is not allowed).
+Paste: You can paste the characters which are copied last time.
+ 
+
+Given a number n. You have to get exactly n 'A' on the notepad by performing the minimum number of steps permitted. Output the minimum number of steps to get n 'A'.
+
+Example 1:
+
+Input: 3
+Output: 3
+Explanation:
+Intitally, we have one character 'A'.
+In step 1, we use Copy All operation.
+In step 2, we use Paste operation to get 'AA'.
+In step 3, we use Paste operation to get 'AAA'.
+ 
+
+Note:
+
+The n will be in the range [1, 1000].
+
+class Solution {
+    public int minSteps(int n) {
+    	int[] ii = new int[n+1];
+    	for(int i =2;i<n+1;i++){
+    		ii[i]=i;
+    		for(int j=i/2;j>0;j--){
+    			if(i%j==0){
+    				ii[i]=ii[j]+i/j;
+    				break;
+    			}
+    		}
+    	}
+
+    	return ii[n];
+
+    }
+
+    public int q(int copy,int t,int n){
+
+    	if(t+copy<n){
+    		int q = q(copy,t+copy,n);
+    		int w = q(t+copy,t+copy,n);
+    		if(w==-1){
+    			if(q==-1){
+    				return -1;
+    			}else{
+    				return 1+q;
+    			}
+    		}else{
+    			
+    			if(q==-1){
+
+    				return 2+w;
+    			}else{
+    				return Math.min(q,w+1)+1;
+    			}
+    		}
+    	}else if(t+copy==n){
+    		return 1;
+    	}else{
+    		return -1;
+    	}
+    }
+}public int minSteps(int n) {
+        int[] cache = new int[n+1];
+        
+        for(int i=2;i<=n;i++) {
+            cache[i] = i;
+            for(int j = i/2; j > 1; j--) {
+                if(i % j == 0) {
+                    cache[i] = cache[j] + (i/j);
+                    break;
+                }
+            }
+        }
+        
+        return cache[n];
+    }  public int minSteps(int n) {
+        int res = 0;
+        for (int k = 2; k <= n; k++)
+            for (; n % k == 0; n /= k, res += k);
+        return res;
+    }
+
+
+652. Find Duplicate Subtrees
+Medium
+
+1470
+
+213
+
+Add to List
+
+Share
+Given the root of a binary tree, return all duplicate subtrees.
+
+For each kind of duplicate subtrees, you only need to return the root node of any one of them.
+
+Two trees are duplicate if they have the same structure with the same node values.
+
+ 
+
+Example 1:
+
+
+Input: root = [1,2,3,4,null,2,4,null,null,4]
+Output: [[2,4],[4]]
+Example 2:
+
+
+Input: root = [2,1,1]
+Output: [[1]]
+Example 3:
+
+
+Input: root = [2,2,2,3,null,3,null]
+Output: [[2,3],[3]]
+ 
+
+Constraints:
+
+The number of the nodes in the tree will be in the range [1, 10^4]
+-200 <= Node.val <= 200
+
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+	
+    public List<TreeNode> findDuplicateSubtrees(TreeNode root) {
+    	List<TreeNode> result = new ArrayList<>();
+    	Map<String,Integer> map = new HashMap<>();
+    	q(root,map,result);
+    	return result;
+
+    }
+
+    public String q(TreeNode root,Map<String,Integer> map,List<TreeNode> result){
+    	if(root==null){
+    		return "!";
+    	}
+
+    	String s = root.val+","+q(root.left,map,result)+","+q(root.right,map,result);
+    	Integer i = map.getOrDefault(s,0);
+    	
+    	if(i==1){
+    		result.add(root);
+    	}
+        i++;
+    	map.put(s,i);
+    	return s;
+    }
+    
+}
+
+653. Two Sum IV - Input is a BST
+Easy
+
+1628
+
+144
+
+Add to List
+
+Share
+Given the root of a Binary Search Tree and a target number k, return true if there exist two elements in the BST such that their sum is equal to the given target.
+
+ 
+
+Example 1:
+
+
+Input: root = [5,3,6,2,4,null,7], k = 9
+Output: true
+Example 2:
+
+
+Input: root = [5,3,6,2,4,null,7], k = 28
+Output: false
+Example 3:
+
+Input: root = [2,1,3], k = 4
+Output: true
+Example 4:
+
+Input: root = [2,1,3], k = 1
+Output: false
+Example 5:
+
+Input: root = [2,1,3], k = 3
+Output: true
+ 
+
+Constraints:
+
+The number of nodes in the tree is in the range [1, 104].
+-104 <= Node.val <= 104
+root is guaranteed to be a valid binary search tree.
+-105 <= k <= 105
+
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    public boolean findTarget(TreeNode root, int k) {
+
+    }
+
+    public boolean q(TreeNode node,int k,int t){
+    	if(k<0){
+    		return false;
+    	}
+
+    	if(k==0){
+    		if(t!=2){
+    			return false;
+    		}
+    		return true;
+    	}
+
+    	if(node == null){
+    		return false;
+    	}
+
+    	
+    	int i = k-node.val;
+    	return q(node.left,k,t)||q(node.right,k,t)
+    			||q(node.left,i,t+1)||q(node.right,i,t+1);
+
+    }
+
+    public boolean findTarget(TreeNode root, int k) {
+       	retrun q(root,root,k);
+    }
+
+    public boolean q(TreeNode node ,TreeNode root,int k){
+    	if(node==null)return false;
+    	TreeNode tn = w(root,k-node.val);
+       	if(tn!=null&&tn!=node){
+       		return true;
+       	}
+
+       	return q(node.left,root,k)||q(node.right,root,k);
+    }
+
+    public TreeNode w(TreeNode node , int q){
+    	if(node==null){
+    		return null;
+    	}
+
+    	if(node.val==q){
+    		return node;
+    	}else if(node.val>q){
+    		return w(node.left,q);
+    	}else{
+    		return w(node.right,q);
+    	}
+    }
+
+
+}
+
+654. Maximum Binary Tree
+Medium
+
+2016
+
+246
+
+Add to List
+
+Share
+Given an integer array with no duplicates. A maximum tree building on this array is defined as follow:
+
+The root is the maximum number in the array.
+The left subtree is the maximum tree constructed from left part subarray divided by the maximum number.
+The right subtree is the maximum tree constructed from right part subarray divided by the maximum number.
+Construct the maximum tree by the given array and output the root node of this tree.
+
+Example 1:
+Input: [3,2,1,6,0,5]
+Output: return the tree root node representing the following tree:
+
+      6
+    /   \
+   3     5
+    \    / 
+     2  0   
+       \
+        1
+Note:
+The size of the given array will be in the range [1,1000].
+
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    public TreeNode constructMaximumBinaryTree(int[] nums) {
+    	return q(nums,0,nums.length);
+
+        
+    }
+
+    public TreeNode q(int[] nums,int start,int end){
+    	if(start==end){
+    		return null;
+    	}
+
+    	int max = start;
+    	for(int i = start+1;i<end;i++){
+    		if(nums[i]>nums[max]){
+    			max=i;
+    		}
+    	}
+
+    	TreeNode node = new TreeNode(nums[max]);
+    	node.left=q(nums,start,max);
+    	node.right=q(nums,max+1,end);
+    	return node;
+    }
+}
+
+655. Print Binary Tree
+Medium
+
+360
+
+861
+
+Add to List
+
+Share
+Print a binary tree in an m*n 2D string array following these rules:
+
+The row number m should be equal to the height of the given binary tree.
+The column number n should always be an odd number.
+The root node's value (in string format) should be put in the exactly middle of the first row it can be put. The column and the row where the root node belongs will separate the rest space into two parts (left-bottom part and right-bottom part). You should print the left subtree in the left-bottom part and print the right subtree in the right-bottom part. The left-bottom part and the right-bottom part should have the same size. Even if one subtree is none while the other is not, you don't need to print anything for the none subtree but still need to leave the space as large as that for the other subtree. However, if two subtrees are none, then you don't need to leave space for both of them.
+Each unused space should contain an empty string "".
+Print the subtrees following the same rules.
+Example 1:
+Input:
+     1
+    /
+   2
+Output:
+[["", "1", ""],
+ ["2", "", ""]]
+Example 2:
+Input:
+     1
+    / \
+   2   3
+    \
+     4
+Output:
+[["", "", "", "1", "", "", ""],
+ ["", "2", "", "", "", "3", ""],
+ ["", "", "4", "", "", "", ""]]
+Example 3:
+Input:
+      1
+     / \
+    2   5
+   / 
+  3 
+ / 
+4 
+Output:
+
+[["",  "",  "", "",  "", "", "", "1", "",  "",  "",  "",  "", "", ""]
+ ["",  "",  "", "2", "", "", "", "",  "",  "",  "",  "5", "", "", ""]
+ ["",  "3", "", "",  "", "", "", "",  "",  "",  "",  "",  "", "", ""]
+ ["4", "",  "", "",  "", "", "", "",  "",  "",  "",  "",  "", "", ""]]
+Note: The height of binary tree is in the range of [1, 10].
+
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    public List<List<String>> printTree(TreeNode root) {
+    	if(root==null) return new ArrayList<>();
+        int length = q(root,0);
+
+        List<List<String>> list = new ArrayList<>();
+        w(root,list,0,0,length,length);
+        return list;
+    }
+
+    public void w(TreeNode root,List<List<String>> list,int level,int start,int end,int length){
+    	if(root==null){
+    		return;
+    	}
+    	if(list.size()<=level){
+    		list.add(new ArrayList<>(length));
+    	}
+
+    	List<String> array=list.get(level);
+    	int position=(start+end)/2;
+    	array.set(position,root.val+"");
+    	w(root.left,list,level+1,start,position,length);
+    	w(root.right,list,level+1,position+1,end,length);
+
+    }
+
+    public int q(TreeNode root,int i){
+    	if(root==null){
+    		return 0;
+    	}
+
+    	return (int)Math.pow(2,i)+Math.max(q(root.left,i+1),q(root.right,i+1));
+    }
+}
+
+657. Robot Return to Origin
+Easy
+
+1084
+
+678
+
+Add to List
+
+Share
+There is a robot starting at position (0, 0), the origin, on a 2D plane. Given a sequence of its moves, judge if this robot ends up at (0, 0) after it completes its moves.
+
+The move sequence is represented by a string, and the character moves[i] represents its ith move. Valid moves are R (right), L (left), U (up), and D (down). If the robot returns to the origin after it finishes all of its moves, return true. Otherwise, return false.
+
+Note: The way that the robot is "facing" is irrelevant. "R" will always make the robot move to the right once, "L" will always make it move left, etc. Also, assume that the magnitude of the robot's movement is the same for each move.
+
+ 
+
+Example 1:
+
+Input: moves = "UD"
+Output: true
+Explanation: The robot moves up once, and then down once. All moves have the same magnitude, so it ended up at the origin where it started. Therefore, we return true.
+Example 2:
+
+Input: moves = "LL"
+Output: false
+Explanation: The robot moves left twice. It ends up two "moves" to the left of the origin. We return false because it is not at the origin at the end of its moves.
+Example 3:
+
+Input: moves = "RRDD"
+Output: false
+Example 4:
+
+Input: moves = "LDRRLRUULR"
+Output: false
+ 
+
+Constraints:
+
+1 <= moves.length <= 2 * 104
+moves only contains the characters 'U', 'D', 'L' and 'R'.
+
+class Solution {
+    public boolean judgeCircle(String moves) {
+    	int up = 0,left=0;
+    	for(char c : moves.toCharArray()){
+    		if(c=='U'){
+    			up++;
+    		}else if(c=='D'){
+    			up--;
+    		}else if(c=='L'){
+    			left++;
+    		}else{
+    			left--;
+    		}
+    	}
+
+    	return up==0&&left==0;
+        
+    }
+}
+
+658. Find K Closest Elements
+Medium
+
+1624
+
+278
+
+Add to List
+
+Share
+Given a sorted array arr, two integers k and x, find the k closest elements to x in the array. The result should also be sorted in ascending order. If there is a tie, the smaller elements are always preferred.
+
+ 
+
+Example 1:
+
+Input: arr = [1,2,3,4,5], k = 4, x = 3
+Output: [1,2,3,4]
+Example 2:
+
+Input: arr = [1,2,3,4,5], k = 4, x = -1
+Output: [1,2,3,4]
+ 
+
+Constraints:
+
+1 <= k <= arr.length
+1 <= arr.length <= 10^4
+Absolute value of elements in the array and x will not exceed 104
+
+class Solution {
+    public List<Integer> findClosestElements(int[] arr, int k, int x) {
+    	if(k>=arr.length)return Arrays.asList(arr);
+
+    	Stack<Integer> stack = new Stack<>();
+    	List<Integer> list = new ArrayList<>();
+    	for(int i : arr){
+    		if(i>x){
+    			while(!stack.isEmpty()){
+    				int z = stack.pop();
+    				if(Math.abs(x-z)<=i-x){
+    					list.add(0,z);
+    					if(list.size()==k){
+	    					return list;
+	    				}
+    				}else{
+    					stack.push(z);
+    					break;
+    				}
+    			}
+
+    			list.add(i);
+    			if(list.size()==k){
+					return list;
+				}
+    		}else{
+    			stack.push(i);
+    		}
+    	}
+
+    	while(!stack.isEmpty()){
+    		list.add(0,stack.pop());
+    		if(list.size()==k){
+    					return list;
+    				}
+    	}
+
+    	return list;
+        int l = 0, r = arr.length - k;
+        while (l < r){
+            int mid = l + (r - l)/2;
+            if (x - arr[mid] > arr[mid + k] - x) 
+                l = mid + 1;
+            else
+                r = mid;
+        }
+        // same as arr[l: ;+ k ] in python or
+        // use Arrays.stream or
+        // as List
+        List<Integer> ret = new ArrayList<>(k);
+		for (int i = l; i < l + k; i++) {
+			ret.add(arr[i]);
+		}
+		return ret;
+    }
+
+
+
+        
+
+
+    }
+}
+
+659. Split Array into Consecutive Subsequences
+Medium
+
+1314
+
+431
+
+Add to List
+
+Share
+Given an array nums sorted in ascending order, return true if and only if you can split it into 1 or more subsequences such that each subsequence consists of consecutive integers and has length at least 3.
+
+ 
+
+Example 1:
+
+Input: [1,2,3,3,4,5]
+Output: True
+Explanation:
+You can split them into two consecutive subsequences : 
+1, 2, 3
+3, 4, 5
+Example 2:
+
+Input: [1,2,3,3,4,4,5,5]
+Output: True
+Explanation:
+You can split them into two consecutive subsequences : 
+1, 2, 3, 4, 5
+3, 4, 5
+Example 3:
+
+Input: [1,2,3,4,4,5]
+Output: False
+ 
+
+Constraints:
+
+1 <= nums.length <= 10000
+
+class Solution {
+    public boolean isPossible(int[] nums) {
+    	Map<Integer,Integer> q=new HashMap<>(),w=new HashMap<>();
+    	for(int i : nums){
+    		q.put(i,q.getOrDefault(i,0)+1);
+    	}
+
+    	for(int i = 0;i<nums.length;i++){
+    		int n=nums[i];
+    		if(q.get(n)==0)continue;
+    		int need = w.getOrDefault(n,0);
+    		if(need>0){
+    			w.put(n+1,w.getOrDefault(n+1,0)+1);
+    		}else if(q.getOrDefault(n+1,0)>0&&q.getOrDefault(n+2,0)>0){
+    			q.put(n+1,q.get(n+1)-1);
+    		    		q.put(n+2,q.get(n+2)-1);
+
+    			w.put(n+3,w.getOrDefault(n+3,0)+1);
+    		}else{
+    			return false;
+    		}
+
+    		q.put(n,q.get(n)-1);
+    	}
+    	
+    	return true;
+        
+    }
+}
+
+class Solution {
+    public boolean isPossible(int[] nums) {
+        int[] len = new int[4];
+        int prev = -1;
+        
+        int i = 0;
+        while (i < nums.length) {
+            int j = i;
+            while (j < nums.length && nums[j] == nums[i])
+                j++;
+            
+            int count = j - i;
+            if (prev == -1)
+                len[1] = count;
+            else {
+                if (prev + 1 != nums[i]) {
+                    if (len[1] > 0 || len[2] > 0)
+                        return false;
+                    len[1] = count;
+                    len[2] = len[3] = 0;
+                }
+                else {
+                    if (count < len[1])
+                        return false;
+                    count -= len[1];
+                    
+                    int len2 = len[1];
+                    
+                    if (count < len[2])
+                        return false;
+                    count -= len[2];
+                    
+                    int len3 = len[2];
+                    
+                    int canDo = Math.min(count, len[3]);
+                    count -= canDo;
+                    
+                    len[1] = count;
+                    len[2] = len2;
+                    len[3] = len3 + canDo;
+                }
+            }
+            
+            prev = nums[i];
+            i = j;
+        }
+        
+        return len[1] == 0 && len[2] == 0;
+    }
+}
+
+661. Image Smoother
+Easy
+
+275
+
+1141
+
+Add to List
+
+Share
+Given a 2D integer matrix M representing the gray scale of an image, you need to design a smoother to make the gray scale of each cell becomes the average gray scale (rounding down) of all the 8 surrounding cells and itself. If a cell has less than 8 surrounding cells, then use as many as you can.
+
+Example 1:
+Input:
+[[1,1,1],
+ [1,0,1],
+ [1,1,1]]
+Output:
+[[0, 0, 0],
+ [0, 0, 0],
+ [0, 0, 0]]
+Explanation:
+For the point (0,0), (0,2), (2,0), (2,2): floor(3/4) = floor(0.75) = 0
+For the point (0,1), (1,0), (1,2), (2,1): floor(5/6) = floor(0.83333333) = 0
+For the point (1,1): floor(8/9) = floor(0.88888889) = 0
+Note:
+The value in the given matrix is in the range of [0, 255].
+The length and width of the given matrix are in the range of [1, 150].
+
+class Solution {
+    public int[][] imageSmoother(int[][] M) {
+    	int[][] ii =new int[][]{{-1,-1},{-1,0},{0,-1},{1,-1},{-1,1},{1,0},{0,1},{1,1}};
+    	int[][] result = new int[M.length][M[0].length];
+    	for(int i=0;i<M.length;i++){
+    		for(int j=0;j<M[i].length;j++){
+    			int z = M[i][j],s=1;
+    			for(int[] q : ii){
+    				if(i+q[0]>-1&&i+q[0]<M.length&&j+q[1]>-1&&j+q[1]<M[i].length){
+    					z+=M[i+q[0]][j+q[1]];
+    					s++;
+    				}
+    			}
+    			result[i][j]=z/s;
+
+    		}
+    	}
+    	return result;
+        
+    }
+}
+
+662. Maximum Width of Binary Tree
+Medium
+
+1826
+
+347
+
+Add to List
+
+Share
+Given a binary tree, write a function to get the maximum width of the given tree. The maximum width of a tree is the maximum width among all levels.
+
+The width of one level is defined as the length between the end-nodes (the leftmost and right most non-null nodes in the level, where the null nodes between the end-nodes are also counted into the length calculation.
+
+It is guaranteed that the answer will in the range of 32-bit signed integer.
+
+Example 1:
+
+Input: 
+
+           1
+         /   \
+        3     2
+       / \     \  
+      5   3     9 
+
+Output: 4
+Explanation: The maximum width existing in the third level with the length 4 (5,3,null,9).
+Example 2:
+
+Input: 
+
+          1
+         /  
+        3    
+       / \       
+      5   3     
+
+Output: 2
+Explanation: The maximum width existing in the third level with the length 2 (5,3).
+Example 3:
+
+Input: 
+
+          1
+         / \
+        3   2 
+       /        
+      5      
+
+Output: 2
+Explanation: The maximum width existing in the second level with the length 2 (3,2).
+Example 4:
+
+Input: 
+
+          1
+         / \
+        3   2
+       /     \  
+      5       9 
+     /         \
+    6           7
+Output: 8
+Explanation:The maximum width existing in the fourth level with the length 8 (6,null,null,null,null,null,null,7).
+ 
+
+Constraints:
+
+The given binary tree will have between 1 and 3000 nodes.
+
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    public int widthOfBinaryTree(TreeNode root) {
+    	Map<Integer,Long> minMap = new HashMap<>();
+    	Map<Integer,Long> maxMap = new HashMap<>();
+        return q(root,0,0,minMap,maxMap);
+        return q(root,0,0,new ArrayList<>());
+    }
+
+    public int q(TreeNode root,int pos,int level,List<Integer> list){
+    	if(root==null){
+    		return 0;
+    	}
+
+    	if(list.size()==level){
+    		list.add(pos);
+    	}
+
+    	int max = pos-list.get(level)+1;
+    	int max1 = q(root.left,pos*2,level+1,list);
+    	max=Math.max(max,max1);
+    	max1=q(root.right,pos*2+1,level+1,list);
+    	return Math.max(max,max1);
+    }
+
+    public int q(TreeNode node,long pos,int level,Map<Integer,Long> minMap,Map<Integer,Long> maxMap){
+    	int max =1;
+    	if(node==null)return 0;
+
+		minMap.put(level,Math.min(minMap.getOrDefault(level,pos),pos));
+		maxMap.put(level,Math.max(maxMap.getOrDefault(level,pos),pos));
+		max=(int)Math.max(max,maxMap.get(level)-minMap.get(level)+1);
+    	int max1=q(node.left,pos*2,level+1,minMap,maxMap);
+    	int max2=q(node.right,pos*2+1,level+1,minMap,maxMap);
+    	return Math.max(max,Math.max(max1,max2));
+    }
+  
+}
+ 
+    private int optimize2(TreeNode root) {
+        if (root == null) return 0;
+        List<Integer> left = new ArrayList<>();
+        return dfs(root, 0, 0, left);
+    }
+    private int dfs(TreeNode node, int level, int index, List<Integer> left) {
+        if (node == null) return 0;
+        if (left.size() == level) {
+            left.add(index);
+        }
+        int width = index - left.get(level) + 1;
+        int leftWidth = dfs(node.left, level + 1, index * 2, left);
+        int rightWidth = dfs(node.right, level + 1, index * 2 + 1, left);
+        return Math.max(width, Math.max(leftWidth, rightWidth));
+    }
+    
+    
+    private int optimize(TreeNode root) {
+        if (root == null) return 0;
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.add(root);
+        Map<TreeNode, Integer> indices = new HashMap<>(); // store index of node in its row.
+        indices.put(root, 0);
+        int maxWidth = 1;
+        while(!queue.isEmpty()) {
+            int size = queue.size();
+            int first = -1;
+            int last = -1;
+            while (size-- > 0) {
+                TreeNode node = queue.remove();
+                int parentIndex = indices.get(node);
+                if (node.left != null) {
+                    queue.add(node.left);
+                    if (first == -1)
+                        first = parentIndex * 2;
+                    last = parentIndex * 2;
+                    indices.put(node.left, parentIndex * 2);
+                }
+                if (node.right != null) {
+                    queue.add(node.right);  
+                    if (first == -1)
+                        first = parentIndex * 2 + 1;
+                    last = parentIndex * 2 + 1;
+                    indices.put(node.right, parentIndex * 2 + 1);
+                }
+            }
+            maxWidth = Math.max(maxWidth, last - first + 1);
+        }
+        return maxWidth;
+    }
+    
+    
+664. Strange Printer
+Hard
+
+488
+
+51
+
+Add to List
+
+Share
+There is a strange printer with the following two special requirements:
+
+The printer can only print a sequence of the same character each time.
+At each turn, the printer can print new characters starting from and ending at any places, and will cover the original existing characters.
+Given a string consists of lower English letters only, your job is to count the minimum number of turns the printer needed in order to print it.
+
+Example 1:
+Input: "aaabbb"
+Output: 2
+Explanation: Print "aaa" first and then print "bbb".
+Example 2:
+Input: "aba"
+Output: 2
+Explanation: Print "aaa" first and then print "b" from the second place of the string, which will cover the existing character 'a'.
+Hint: Length of the given string will not exceed 100.
+
+class Solution {
+    public int strangePrinter(String s) {
+    	int[][] ii = new int[s.length()][s.length()];
+    	for(int i = 0;i<ii.length;i++){
+    		for(int j = i;j>-1;j--){
+    			if(i==j){
+    				ii[j][i]=1;
+    				continue;
+    			}
+
+    			ii[j][i]=ii[j][i-1]+1;
+    			int k = i;
+    			while(k>j){
+    				if(s.charAt(i)==s.charAt(k))
+    				ii[j][i]=Math.min(ii[j][i],ii[j][k]+ii[k+1][i-1]);
+    				k--;
+
+    			}
+    		}
+    	}
+    	return ii[0][ii.length-1];
+        
+    }
+}
+
+ int strangePrinter(string s) {
+        int n = s.size();
+        vector<vector<int>> dp(n, vector<int>(n, 0));
+        for (int i = n - 1; i >= 0; --i) {
+            for (int j = i; j < n; ++j) {
+                dp[i][j] = (i == j) ? 1 : (1 + dp[i + 1][j]);
+                for (int k = i + 1; k <= j; ++k) {
+                    if (s[k] == s[i]) dp[i][j] = min(dp[i][j], dp[i + 1][k - 1] + dp[k][j]);
+                }
+            }
+        }
+        return (n == 0) ? 0 : dp[0][n - 1];
+    }
+665. Non-decreasing Array
+Easy
+
+2195
+
+523
+
+Add to List
+
+Share
+Given an array nums with n integers, your task is to check if it could become non-decreasing by modifying at most 1 element.
+
+We define an array is non-decreasing if nums[i] <= nums[i + 1] holds for every i (0-based) such that (0 <= i <= n - 2).
+
+ 
+
+Example 1:
+
+Input: nums = [4,2,3]
+Output: true
+Explanation: You could modify the first 4 to 1 to get a non-decreasing array.
+Example 2:
+
+Input: nums = [4,2,1]
+Output: false
+Explanation: You can't get a non-decreasing array by modify at most one element.
+ 
+
+Constraints:
+
+1 <= n <= 10 ^ 4
+- 10 ^ 5 <= nums[i] <= 10 ^ 5
+int counter = 0;
+        for(int i = 1; i < nums.length; i++){
+            if(nums[i] < nums[ i - 1]){
+                 counter++;
+                if(counter == 2) return false;
+                if(i-2<0 || nums[i-2] <= nums[i])nums[i-1] = nums[i];
+                else nums[i] = nums[i - 1];
+            }
+        }
+        
+        return counter <= 1;
+class Solution {
+    public boolean checkPossibility(int[] nums) {
+    	boolean b = false;
+    	int pre = Integer.MIN_VALUE;
+    	for(int i = 1;i<nums.length;i++){
+    		if(nums[i]<nums[i-1]){
+    			if(b){
+    				return false;
+    			}
+    			if(pre<=nums[i]){
+    				nums[i-1]=pre;
+    			}else{
+    				nums[i]=nums[i-1];
+    			}
+    			b=true;
+    		}
+    		pre=nums[i-1];
+
+    	}
+
+
+    	return true;
+        
+    }
+}
+
+667. Beautiful Arrangement II
+Medium
+
+354
+
+656
+
+Add to List
+
+Share
+Given two integers n and k, you need to construct a list which contains n different positive integers ranging from 1 to n and obeys the following requirement:
+Suppose this list is [a1, a2, a3, ... , an], then the list [|a1 - a2|, |a2 - a3|, |a3 - a4|, ... , |an-1 - an|] has exactly k distinct integers.
+
+If there are multiple answers, print any of them.
+
+Example 1:
+Input: n = 3, k = 1
+Output: [1, 2, 3]
+Explanation: The [1, 2, 3] has three different positive integers ranging from 1 to 3, and the [1, 1] has exactly 1 distinct integer: 1.
+Example 2:
+Input: n = 3, k = 2
+Output: [1, 3, 2]
+Explanation: The [1, 3, 2] has three different positive integers ranging from 1 to 3, and the [2, 1] has exactly 2 distinct integers: 1 and 2.
+Note:
+The n and k are in the range 1 <= k < n <= 104.
+
+class Solution {
+    public int[] constructArray(int n, int k) {
+    	int[] ii = new int[n];
+    	int q=0,w=1,e=n;
+    	while(w<=e){
+    		if(k>1){
+    			ii[q]=(k--%2==1?w++:e--);
+    		}else{
+    			ii[q]=++w;
+    		}
+    		q++;
+    	}
+    	return ii;
+        
+    }
+}
+
+668. Kth Smallest Number in Multiplication Table
+Hard
+
+627
+
+21
+
+Add to List
+
+Share
+Nearly every one have used the Multiplication Table. But could you find out the k-th smallest number quickly from the multiplication table?
+
+Given the height m and the length n of a m * n Multiplication Table, and a positive integer k, you need to return the k-th smallest number in this table.
+
+Example 1:
+Input: m = 3, n = 3, k = 5
+Output: 
+Explanation: 
+The Multiplication Table:
+1	2	3
+2	4	6
+3	6	9
+
+The 5-th smallest number is 3 (1, 2, 2, 3, 3).
+Example 2:
+Input: m = 2, n = 3, k = 6
+Output: 
+Explanation: 
+The Multiplication Table:
+1	2	3
+2	4	6
+
+The 6-th smallest number is 6 (1, 2, 2, 3, 4, 6).
+Note:
+The m and n will be in the range [1, 30000].
+The k will be in the range [1, m * n]
+
+这道题跟之前那道Kth Smallest Element in a Sorted Matrix没有什么太大的区别，这里的乘法表也是各行各列分别有序的。那么之前帖子里的方法都可以拿来参考。之前帖子中的解法一在这道题中无法通过OJ，维护一个大小为k的优先队列实在是没有利用到这道题乘法表的特点，但是后两种解法都是可以的。为了快速定位出第K小的数字，我们采用二分搜索法，由于是有序矩阵，那么左上角的数字一定是最小的，而右下角的数字一定是最大的，所以这个是我们搜索的范围，然后我们算出中间数字mid，由于矩阵中不同行之间的元素并不是严格有序的，所以我们要在每一行都查找一下mid，由于乘法表每行都是连续数字1，2，3...乘以当前行号（从1开始计数），所以我们甚至不需要在每行中使用二分查找，而是直接定位出位置。具体做法是，先比较mid和该行最后一个数字的大小，最后一数字是n * i，i是行数，n是该行数字的个数，如果mid大的话，直接将该行所有数字的个数加入cnt，否则的话加上mid / i，比如当前行是2, 4, 6, 8, 10，如果我们要查找小于7的个数，那么就是7除以2，得3，就是有三个数小于7，直接加入cnt即可。这样我们就可以快速算出矩阵中所有小于mid的个数，根据cnt和k的大小关系，来更新我们的范围，循环推出后，left就是第K小的数字，参见代码如下：
+
+ 
+
+解法一：
+
+复制代码
+ class Solution {
+ public:
+     int findKthNumber(int m, int n, int k) {
+         int left = 1, right = m * n;
+         while (left < right) {
+             int mid = left + (right - left) / 2, cnt = 0;
+             for (int i = 1; i <= m; ++i) {
+                 cnt += (mid > n * i) ? n : (mid / i);
+             }
+             if (cnt < k) left = mid + 1;
+             else right = mid;
+         }
+         return right;
+     }
+ };
+复制代码
+ 
+
+下面这种解法在统计小于mid的数字个数的方法上有些不同，并不是逐行来统计，而是从左下角的数字开始统计，如果该数字小于mid，说明该数字及上方所有数字都小于mid，cnt加上i个，然后向右移动一位继续比较。如果当前数字小于mid了，那么向上移动一位，直到横纵方向有一个越界停止，其他部分都和上面的解法相同，参见代码如下：
+
+ 
+
+解法二：
+
+复制代码
+ class Solution {
+ public:
+     int findKthNumber(int m, int n, int k) {
+         int left = 1, right = m * n;
+         while (left < right) {
+             int mid = left + (right - left) / 2, cnt = 0, i = m, j = 1;
+             while (i >= 1 && j <= n) {
+                 if (i * j <= mid) {
+                     cnt += i;
+                     ++j;
+                 } else {
+                     --i;
+                 }
+             }
+             if (cnt < k) left = mid + 1;
+             else right = mid;
+         }
+         return right;
+     }
+ };
+复制代码
+ 
+
+下面这种解法由网友bambu提供，是对解法二的优化，再快一点，使用除法来快速定位新的j值，然后迅速算出当前行的小于mid的数的个数，然后快速更新i的值，这比之前那种一次只加1或减1的方法要高效许多，感觉像是解法一和解法二的混合体，参见代码如下：
+
+ 
+
+解法三：
+
+复制代码
+ class Solution {
+ public:
+     int findKthNumber(int m, int n, int k) {
+        int left = 1, right = m * n;
+        while (left < right) {
+            int mid = left + (right - left) / 2, cnt = 0, i = m, j = 1;
+            while (i >= 1 && j <= n) {
+                 int t = j;
+                 j = (mid > n * i) ? n + 1 : (mid / i + 1);
+                 cnt += (j - t) * i;
+                 i = mid / j;
+             }
+            if (cnt < k) left = mid + 1;
+            else right = mid;
+        }
+        return right;
+     }
+ };
+
+ public int findKthNumber(int m, int n, int k) {
+        int l = 1;
+        int h = m * n + 1;
+        while (l < h) {
+            int mid = (l + h) >> 1;
+            if (isPossible(mid, m, n, k)) {
+                h = mid;
+            } else {
+                l = mid + 1;
+            }
+        }
+        return l;
+    }
+
+    private boolean isPossible(int target, int m, int n, int k) {
+        int count = 0;
+        for (int r = 1; r <= m; r++) {
+            if (r > target) {
+                break;
+            }
+            count += Math.min(n, target / r);
+        }
+        return count >= k;
+    }
+
+class Solution {
+    public int findKthNumber(int m, int n, int k) {
+    	int left =0,right=n*m;
+    	while(left<right){
+    		int mid = left+(right-left)/2;
+    		int count=0;
+    		for(int i=1;i<=m;i++){
+    			count+=(i*n<=mid?n:mid/i);
+    		}
+
+    		if(count<k)left=mid+1;
+    		else right=mid;
+    	}
+    	return left;
+    }
+}
+
+669. Trim a Binary Search Tree
+Easy
+
+2098
+
+193
+
+Add to List
+
+Share
+Given the root of a binary search tree and the lowest and highest boundaries as low and high, trim the tree so that all its elements lies in [low, high]. Trimming the tree should not change the relative structure of the elements that will remain in the tree (i.e., any node's descendant should remain a descendant). It can be proven that there is a unique answer.
+
+Return the root of the trimmed binary search tree. Note that the root may change depending on the given bounds.
+
+ 
+
+Example 1:
+
+
+Input: root = [1,0,2], low = 1, high = 2
+Output: [1,null,2]
+Example 2:
+
+
+Input: root = [3,0,4,null,2,null,null,1], low = 1, high = 3
+Output: [3,2,null,1]
+Example 3:
+
+Input: root = [1], low = 1, high = 2
+Output: [1]
+Example 4:
+
+Input: root = [1,null,2], low = 1, high = 3
+Output: [1,null,2]
+Example 5:
+
+Input: root = [1,null,2], low = 2, high = 4
+Output: [2]
+ 
+
+Constraints:
+
+The number of nodes in the tree in the range [1, 104].
+0 <= Node.val <= 104
+The value of each node in the tree is unique.
+root is guaranteed to be a valid binary search tree.
+0 <= low <= high <= 104
+
+class Solution {
+    public TreeNode trimBST(TreeNode root, int low, int high) {
+        if(root==null)return null;
+        if(root.val>high){
+        	return trimBST(root.left,  low,  high);
+        }else if(root.val<low){
+        	return trimBST(root.right,  low,  high);
+        }
+
+
+        else{
+        	root.left=trimBST(root.left,  low,  high);
+        	root.right=trimBST(root.right,  low,  high);
+        	return root;
+        }
+
+
+
+    }
+
+    public void w(TreeNode root,int low,boolean b ){
+    	if(root==null){
+    		return;
+    	}
+
+    	if(z(root.left,low,b)){
+    		root.left=null;
+    	}else{
+    		w(root.left,low,b);
+    	}
+
+    	if(z(root.right,low,b)){
+    		root.right=null;
+    	}else{
+    		w(root.right,low,b);
+    	}
+    }
+
+
+    public boolean z(TreeNode child,int low,boolean b){
+    	if(child==null){
+    		return false;
+    	}
+
+    	if(b){
+	    	if(child.val<low){
+	    		return true;
+	    	}
+	    	}else{
+	    		if(child.val>low){
+	    			return true;
+	    		}
+	    	}
+    	
+
+    	return false;
+    }
+
+    public TreeNode q(TreeNode root,int low, int high){
+    	if(root.val>high){
+        	return q(root.left,low,high);
+        }
+
+        if(root.val<low){
+        	        return	q(root.right,low,high);
+
+        }
+
+        return root;
+    }
+}
+
+670. Maximum Swap
+Medium
+
+1215
+
+79
+
+Add to List
+
+Share
+Given a non-negative integer, you could swap two digits at most once to get the maximum valued number. Return the maximum valued number you could get.
+
+Example 1:
+Input: 2736
+Output: 7236
+Explanation: Swap the number 2 and the number 7.
+Example 2:
+Input: 9973
+Output: 9973
+Explanation: No swap.
+Note:
+The given number is in the range [0, 108]
+
+class Solution {
+    public int maximumSwap(int num) {
+    	int max = -1;
+    	int r = 0;
+    	while(num!=0){
+    		int n = num%10;
+    		if(n>=max){
+    			max = n;
+    		}else
+    		r=r*10+n;
+    		num=num/10;
+    	}
+
+    	while(r!=0){
+    		int n = r%10;
+    		if(max>n)
+    	}
+    	List<Integer> a = new ArrayList<>();
+    	while(num!=0){
+    		a.add(num%10);
+    		num/=10;
+    	}
+
+    	int m = -1;
+    	for(int i = a.size()-1;i>-1;i--){
+    		 m = i;
+    		for(int j=i-1;j>-1;j--){
+
+    			if(a.get(j)>a.get(i)&&a.get(m)<=a.get(j)){
+    				m=j;
+    			}
+    		}
+    		if(m!=i){
+    			int t = a.get(i);
+    			a.set(i,a.get(m));
+    			a.set(m,t);
+    			break;
+    		}
+    	}
+
+    	if(m==-1)return num;
+    	int r = 0;
+    	for(int i = a.size()-1;i>0;i--){
+    		r=r*10+a.get(i);
+    	}
+    	return r;
+        
+    }
+}
+
+671. Second Minimum Node In a Binary Tree
+Easy
+
+699
+
+951
+
+Add to List
+
+Share
+Given a non-empty special binary tree consisting of nodes with the non-negative value, where each node in this tree has exactly two or zero sub-node. If the node has two sub-nodes, then this node's value is the smaller value among its two sub-nodes. More formally, the property root.val = min(root.left.val, root.right.val) always holds.
+
+Given such a binary tree, you need to output the second minimum value in the set made of all the nodes' value in the whole tree.
+
+If no such second minimum value exists, output -1 instead.
+
+ 
+
+ 
+
+Example 1:
+
+
+Input: root = [2,2,5,null,null,5,7]
+Output: 5
+Explanation: The smallest value is 2, the second smallest value is 5.
+Example 2:
+
+
+Input: root = [2,2,2]
+Output: -1
+Explanation: The smallest value is 2, but there isn't any second smallest value.
+ 
+
+Constraints:
+
+The number of nodes in the tree is in the range [1, 25]. 
+1 <= Node.val <= 231 - 1
+root.val == min(root.left.val, root.right.val) for each internal node of the tree.
+
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    public int findSecondMinimumValue(TreeNode root) {
+        return q(root,root.val);
+    }
+
+    public int q(TreeNode node,int val){
+    	if(node==null){
+    		return -1;
+    	}
+
+    	if(node.val>val){
+    		return node.val;
+    	}
+
+    	int z = q(node.left,val);
+    	int q = q(node.right,val);
+    	if(z==-1){
+    		return q;
+    	}else{
+    		return q==-1?z:Math.min(q,z);
+    	}
+    }
+
+}
+
+672. Bulb Switcher II
+Medium
+
+149
+
+920
+
+Add to List
+
+Share
+There is a room with n lights which are turned on initially and 4 buttons on the wall. After performing exactly m unknown operations towards buttons, you need to return how many different kinds of status of the n lights could be.
+
+Suppose n lights are labeled as number [1, 2, 3 ..., n], function of these 4 buttons are given below:
+
+Flip all the lights.
+Flip lights with even numbers.
+Flip lights with odd numbers.
+Flip lights with (3k + 1) numbers, k = 0, 1, 2, ...
+ 
+
+Example 1:
+
+Input: n = 1, m = 1.
+Output: 2
+Explanation: Status can be: [on], [off]
+ 
+
+Example 2:
+
+Input: n = 2, m = 1.
+Output: 3
+Explanation: Status can be: [on, off], [off, on], [off, off]
+ 
+
+Example 3:
+
+Input: n = 3, m = 1.
+Output: 4
+Explanation: Status can be: [off, on, off], [on, off, on], [off, off, off], [off, on, on].
+ 
+n-1 m
+n m-1
+Note: n and m both fit in range [0, 1000].
+
+这道题是之前那道Bulb Switcher的拓展，但是关灯的方式改变了。现在有四种关灯方法，全关，关偶数灯，关奇数灯，关3k+1的灯。现在给我们n盏灯，允许m步操作，问我们总共能组成多少种不同的状态。博主开始想，题目没有让列出所有的情况，而只是让返回总个数。那么博主觉得应该不能用递归的暴力破解来做，一般都是用DP来做啊。可是想了半天也没想出递推公式，只得作罢。只好去参考大神们的做法，发现这道题的结果并不会是一个超大数，最多情况只有8种。转念一想，也是，如果结果是一个超大数，一般都会对一个超大数10e7来取余，而这道题并没有，所以是一个很大的hint，只不过博主没有get到。博主应该多列几种情况的，说不定就能找出规律。下面先来看一种暴力解法，首先我们先做一个小小的优化，我们来分析四种情况：
+
+第一种情况：1，2，3，4，5，6，7，8，9，10，11，12，13，14，15，...
+
+第二种情况：1，2，3，4，5，6，7，8，9，10，11，12，13，14，15，...
+
+第三种情况：1，2，3，4，5，6，7，8，9，10，11，12，13，14，15，...
+
+第四种情况：1，2，3，4，5，6，7，8，9，10，11，12，13，14，15，...
+
+通过观察上面的数组，我们可以发现以6个为1组，都是重复的pattern，那么实际上我们可以把重复的pattern去掉而且并不会影响结果。如果n大于6，我们则对其取余再加上6，新的n跟使用原来的n会得到同样的结果，但这样降低了我们的计算量。
+
+下面我们先来生成n个1，这里1表示灯亮，0表示灯灭，然后我们需要一个set来记录已经存在的状态，用一个queue来辅助我们的BFS运算。我们需要循环m次，因为要操作m次，每次开始循环之前，先统计出此时queue中数字的个数len，然后进行len次循环，这就像二叉树中的层序遍历，必须上一层的结点全部遍历完了才能进入下一层，当然，在每一层开始前，我们都需要情况集合s，这样每个操作之间才不会互相干扰。然后在每层的数字循环中，我们取出队首状态，然后分别调用四种方法，突然感觉，这很像迷宫遍历问题，上下左右四个方向，周围四个状态算出来，我们将不再集合set中的状态加入queue和集合set。当m次操作遍历完成后，队列queue中状态的个数即为所求，参见代码如下：
+
+class Solution {
+    public int flipLights(int n, int m) {
+    	if(m==0||n==0)return 1;
+    	if(n==1)return 2;
+    	if(n==2)return m==1?3:4;
+        if(m==1)return 4;
+    	return m==2?7:8;
+
+    }
+
+   
+}
+
+673. Number of Longest Increasing Subsequence
+Medium
+
+1932
+
+110
+
+Add to List
+
+Share
+Given an integer array nums, return the number of longest increasing subsequences.
+
+Notice that the sequence has to be strictly increasing.
+
+ 
+
+Example 1:
+
+Input: nums = [1,3,5,4,7]
+Output: 2
+Explanation: The two longest increasing subsequences are [1, 3, 4, 7] and [1, 3, 5, 7].
+Example 2:
+
+Input: nums = [2,2,2,2,2]
+Output: 5
+Explanation: The length of longest continuous increasing subsequence is 1, and there are 5 subsequences' length is 1, so output 5.
+
+ 
+
+Constraints:
+
+1 <= nums.length <= 2000
+-106 <= nums[i] <= 106
+
+
+[1,2,4,3,5,4,7,2]
+Output
+2
+Expected
+3
+[3,1,2]
+[1,1,1,2,2,2,3,3,3]
+class Solution {
+    public int findNumberOfLIS(int[] nums) {
+    	int[] q = new int[nums.length];
+
+    	int[] w = new int[nums.length];
+    	int max = 1 ;
+    	int res = 0;
+
+       	for(int i=0;i<nums.length;i++){
+       		for(int j=i-1;j>-1;j--){
+       			if(nums[i]>nums[j]){
+       				if(q[i]>q[j]+1){
+       					continue;
+       				}else if(q[i]==q[j]+1){
+       					w[i]+=w[j];
+       				}else{
+       					q[i]=q[j]+1;
+       					w[i]=w[j];
+       				}
+
+       			}
+       		}
+       		if(w[i]==0){
+       			w[i]=1;
+       		}
+
+       		if(q[i]==0){
+       			q[i]=1;
+       		}
+       		if(q[i]>max){
+       			max=q[i];
+       			res = w[i];
+       		}else if(q[i]==max){
+       			res+=w[i];
+       		}
+       		
+       	}
+
+
+       	return res;
+
+    }
+}
+
+674. Longest Continuous Increasing Subsequence
+Easy
+
+972
+
+129
+
+Add to List
+
+Share
+Given an unsorted array of integers nums, return the length of the longest continuous increasing subsequence (i.e. subarray). The subsequence must be strictly increasing.
+
+A continuous increasing subsequence is defined by two indices l and r (l < r) such that it is [nums[l], nums[l + 1], ..., nums[r - 1], nums[r]] and for each l <= i < r, nums[i] < nums[i + 1].
+
+ 
+
+Example 1:
+
+Input: nums = [1,3,5,4,7]
+Output: 3
+Explanation: The longest continuous increasing subsequence is [1,3,5] with length 3.
+Even though [1,3,5,7] is an increasing subsequence, it is not continuous as elements 5 and 7 are separated by element
+4.
+Example 2:
+
+Input: nums = [2,2,2,2,2]
+Output: 1
+Explanation: The longest continuous increasing subsequence is [2] with length 1. Note that it must be strictly
+increasing.
+ 
+
+Constraints:
+
+0 <= nums.length <= 104
+-109 <= nums[i] <= 109
+
+class Solution {
+    public int findLengthOfLCIS(int[] nums) {
+        if(nums.length<2)return nums.length;
+        int max = 1;
+        int res = 1;
+        for(int i=1;i<nums.length;i++){
+        	if(nums[i]>nums[i-1]){
+        		max++;
+                res=Math.max(max,res);
+        	}else{
+                
+        		max=1;
+        	}
+        }
+        return max;
+    }
+}
+
+675. Cut Off Trees for Golf Event
+Hard
+
+588
+
+347
+
+Add to List
+
+Share
+You are asked to cut off trees in a forest for a golf event. The forest is represented as a non-negative 2D map, in this map:
+
+0 represents the obstacle can't be reached.
+1 represents the ground can be walked through.
+The place with number bigger than 1 represents a tree can be walked through, and this positive number represents the tree's height.
+In one step you can walk in any of the four directions top, bottom, left and right also when standing in a point which is a tree you can decide whether or not to cut off the tree.
+
+You are asked to cut off all the trees in this forest in the order of tree's height - always cut off the tree with lowest height first. And after cutting, the original place has the tree will become a grass (value 1).
+
+You will start from the point (0, 0) and you should output the minimum steps you need to walk to cut off all the trees. If you can't cut off all the trees, output -1 in that situation.
+
+You are guaranteed that no two trees have the same height and there is at least one tree needs to be cut off.
+
+Example 1:
+
+Input: 
+[
+ [1,2,3],
+ [0,0,4],
+ [7,6,5]
+]
+Output: 6
+ 
+
+Example 2:
+
+Input: 
+[
+ [1,2,3],
+ [0,0,0],
+ [7,6,5]
+]
+Output: -1
+ 
+
+Example 3:
+
+Input: 
+[
+ [2,3,4],
+ [0,0,5],
+ [8,7,6]
+]
+Output: 6
+Explanation: You started from the point (0,0) and you can cut off the tree in (0,0) directly without walking.
+ 
+
+Constraints:
+
+1 <= forest.length <= 50
+1 <= forest[i].length <= 50
+0 <= forest[i][j] <= 10^9
+
+class Solution {
+    public int cutOffTree(List<List<Integer>> forest) {
+    
+    List<List<Integer>> list = new ArrayList<>();
+    for( int a=0;a<forest.size();a++){
+        	for(int s=0;s<forest.get(a).size();s++){
+        		if(forest.get(a).get(s)>1){
+        			list.add(Arrays.asList(forest.get(a).get(s),a,s));
+        		}
+        	}
+        }
+
+        Collections.sort(list,(x,y)->{
+        	return x.get(0)-y.get(0);
+        });
+
+        int row=0,col=0,result=0;
+        for(int i = 0;i<list.size();i++){
+        	int count=q(forest,row,col,list.get(i).get(1),list.get(i).get(2));
+        	if(count==-1){
+        		return -1;
+        	}
+        	result+=count;
+        	row=list.get(i).get(1);
+        	col=list.get(i).get(2);
+        }
+        return result;
+        
+    }
+
+    public int q(List<List<Integer>> list ,int row,int col, int i ,int j){
+    if(row==i&&col==j)return 0;
+    	int[][] ii =new int[list.size()][list.get(0).size()];
+    	ii[row][col]=1;
+    	int[] qq = new int[]{1,0,-1,0,1};
+    	Queue<Integer> queue = new LinkedBlockingQueue<>();
+    	queue.add(row*ii[0].length+col);
+    	int count=0;
+    	while(!queue.isEmpty()){
+    		count++;
+    		int size = queue.size();
+    		for(int z = 0;z<size;z++){
+    			int r = queue.peek()/ii[0].length,c=queue.peek()%ii[0].length;queue.poll();
+    			for(int k=0;k<4;k++){
+    				int x = r +qq[k],y=c+qq[k+1];
+    				if(x<0||y<0||x==ii.length||y==ii[0].length||ii[x][y]==1||list.get(x).get(y)==0)continue;
+    				if(x==i&&y==j)return count;
+    				ii[x][y]=1;
+    				queue.add(x*ii[0].length+y);
+    			}
+    		}
+    	}
+    	return -1;
+    	
+    }
+}
+
+
+676. Implement Magic Dictionary
+Medium
+
+688
+
+148
+
+Add to List
+
+Share
+Design a data structure that is initialized with a list of different words. Provided a string, you should determine if you can change exactly one character in this string to match any word in the data structure.
+
+Implement the MagicDictionary class:
+
+MagicDictionary() Initializes the object.
+void buildDict(String[] dictionary) Sets the data structure with an array of distinct strings dictionary.
+bool search(String searchWord) Returns true if you can change exactly one character in searchWord to match any string in the data structure, otherwise returns false.
+ 
+
+Example 1:
+
+Input
+["MagicDictionary", "buildDict", "search", "search", "search", "search"]
+[[], [["hello", "leetcode"]], ["hello"], ["hhllo"], ["hell"], ["leetcoded"]]
+Output
+[null, null, false, true, false, false]
+
+Explanation
+MagicDictionary magicDictionary = new MagicDictionary();
+magicDictionary.buildDict(["hello", "leetcode"]);
+magicDictionary.search("hello"); // return False
+magicDictionary.search("hhllo"); // We can change the second 'h' to 'e' to match "hello" so we return True
+magicDictionary.search("hell"); // return False
+magicDictionary.search("leetcoded"); // return False
+ 
+
+Constraints:
+
+1 <= dictionary.length <= 100
+1 <= dictionary[i].length <= 100
+dictionary[i] consists of only lower-case English letters.
+All the strings in dictionary are distinct.
+1 <= searchWord.length <= 100
+searchWord consists of only lower-case English letters.
+buildDict will be called only once before search.
+At most 100 calls will be made to search.
+["MagicDictionary", "buildDict", "search", "search", "search", "search", "search", "search"]
+[[], [["hello","hallo","leetcode","judge", "judgg"]], ["hello"], ["hallo"], ["hell"], ["leetcodd"], ["judge"], ["juggg"]]
+class MagicDictionary {
+
+	Node node =new Node();
+    /** Initialize your data structure here. */
+    public MagicDictionary() {
+        
+    }
+    
+    public void buildDict(String[] dictionary) {
+
+    	node =new Node();
+    	Node now = node;
+    	for(String ss : dictionary){
+    		for(int i = 0;i<ss.length();i++){
+    			int j = ss.charAt(i)-'a';
+    			if(now.next[j]==null){
+    				now.next[j]=new Node();
+    				now.list.add(j);
+    				
+    			}
+
+
+    			if(i+1<ss.length())
+    			now.next[j].array.add(ss.substring(i+1));
+    			else{
+    				now.next[j].array.add("");
+    			}
+    			now=now.next[j];
+    			
+    		}
+    		now=node;
+    	}
+        
+    }
+    
+    public boolean search(String searchWord) {
+
+        
+        Node now = node;
+        for(int i =0;i<searchWord.length();i++){
+        	int j = searchWord.charAt(i)-'a';
+        	if(now.list.isEmpty()){
+        		return false;
+        	}
+
+        	String s = "";
+        	if(i+1<searchWord.length()){
+        		s = searchWord.substring(i+1);
+        		
+        	}
+
+        	for(int k : now.list){
+        			if(k!=j){
+        				if(now.next[k].array.contains(s)){
+	        				return true;
+		        		}
+        			}
+        		}
+        	
+        	
+
+        	if(now.next[j]!=null){
+        		now=now.next[j];
+        		continue;
+        	}
+
+        	return false;
+        }
+        return false;
+    }
+}
+
+class Node{
+	Node[] next= new Node[26];
+	List<Integer> list = new ArrayList<>();
+	Set<String> array=new HashSet<>();
+
+}
+
+/*
+ * Space: O(n) where n is the numWords in the dictionary
+ * Time: O(nm) where n is the numWords of same length, m is numChars in searchWord
+ */
+class MagicDictionary {
+    Map<Integer, List<String>> groupByLength;
+
+    /** Initialize your data structure here. */
+    public MagicDictionary() {
+        groupByLength = new HashMap<>();
+    }
+    
+    public void buildDict(String[] dictionary) {
+        for (String word: dictionary) {
+            List<String> group = groupByLength.getOrDefault(
+                                    word.length(), new ArrayList<>());
+            group.add(word);
+            groupByLength.put(word.length(), group);
+        }
+    }
+    
+    public boolean search(String searchWord) {
+        if (groupByLength.containsKey(searchWord.length())) {
+            for (String dictWord: groupByLength.get(searchWord.length())) {
+                if (onlyOneCharDifferent(searchWord, dictWord)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
+    private boolean onlyOneCharDifferent(String searchWord, String dictWord) {
+        int diffIndex = 0;
+        while (diffIndex < searchWord.length() &&
+               searchWord.charAt(diffIndex) == dictWord.charAt(diffIndex)) {
+            diffIndex++;
+        }
+        if (diffIndex == searchWord.length()) {
+            return false;
+        }
+        return searchWord.substring(diffIndex+1).equals(dictWord.substring(diffIndex+1));
+    }
+}
+
+/**
+ * Your MagicDictionary object will be instantiated and called as such:
+ * MagicDictionary obj = new MagicDictionary();
+ * obj.buildDict(dictionary);
+ * boolean param_2 = obj.search(searchWord);
+ */
+
+677. Map Sum Pairs
+Medium
+
+603
+
+90
+
+Add to List
+
+Share
+Implement the MapSum class:
+
+MapSum() Initializes the MapSum object.
+void insert(String key, int val) Inserts the key-val pair into the map. If the key already existed, the original key-value pair will be overridden to the new one.
+int sum(string prefix) Returns the sum of all the pairs' value whose key starts with the prefix.
+ 
+
+Example 1:
+
+Input
+["MapSum", "insert", "sum", "insert", "sum"]
+[[], ["apple", 3], ["ap"], ["app", 2], ["ap"]]
+Output
+[null, null, 3, null, 5]
+
+Explanation
+MapSum mapSum = new MapSum();
+mapSum.insert("apple", 3);  
+mapSum.sum("ap");           // return 3 (apple = 3)
+mapSum.insert("app", 2);    
+mapSum.sum("ap");           // return 5 (apple + app = 3 + 2 = 5)
+ 
+["MapSum", "insert", "sum", "insert", "sum", "insert", "insert", "sum"]
+[[], ["apple",3], ["ap"], ["app",2], ["ap"], ["apple", 5], ["apple", 1], ["apple"]]
+Constraints:
+
+1 <= key.length, prefix.length <= 50
+key and prefix consist of only lowercase English letters.
+1 <= val <= 1000
+At most 50 calls will be made to insert and sum.
+
+class MapSum {
+	Node node = new Node();
+	Map<String,Integer> map = new HashMap<>();
+
+    /** Initialize your data structure here. */
+    public MapSum() {
+        
+    }
+    
+    public void insert(String key, int val) {
+    	int q = map.getOrDefault(key,0);
+    	        map.put(key,val);
+
+    	val=val-q;
+        Node now = node;
+        for(char c : key.toCharArray()){
+        	if(now.next[c-'a']==null){
+        		now.next[c-'a']=new Node();
+        	}
+        	now.next[c-'a'].i+=val;
+        	now=now.next[c-'a'];
+        }
+
+    }
+    
+    public int sum(String prefix) {
+        Node now = node;
+        for(char c : prefix.toCharArray()){
+        	now=now.next[c-'a'];
+        	if(now==null){
+        		return 0;
+        	}
+        }
+        return now.i;
+    }
+}
+
+class Node{
+	Node[] next = new Node[26];
+	int i = 0;
+}
+
+678. Valid Parenthesis String
+Medium
+
+2193
+
+61
+
+Add to List
+
+Share
+Given a string containing only three types of characters: '(', ')' and '*', write a function to check whether this string is valid. We define the validity of a string by these rules:
+
+Any left parenthesis '(' must have a corresponding right parenthesis ')'.
+Any right parenthesis ')' must have a corresponding left parenthesis '('.
+Left parenthesis '(' must go before the corresponding right parenthesis ')'.
+'*' could be treated as a single right parenthesis ')' or a single left parenthesis '(' or an empty string.
+An empty string is also valid.
+Example 1:
+Input: "()"
+Output: True
+Example 2:
+Input: "(*)"
+Output: True
+Example 3:
+Input: "(*))"
+Output: True
+Note:
+The string size will be in the range [1, 100].
+
+class Solution {
+    public boolean checkValidString(String s) {
+    	Stack<Integer> ss = new Stack();
+    	Stack<Integer> sss = new Stack();
+    	for(int i =0;i<s.length();i++){
+    		char c = s.charAt(i);
+    		if(c=='('){
+    			ss.push(i);
+    		}else if(c=='*'){
+    			sss.push(i);
+    		}else{
+    			if(!ss.isEmpty()){
+    				ss.pop();
+    				continue;
+    			}
+
+    			if(!sss.isEmpty()){
+    				sss.pop();
+    				continue;
+    			}
+
+    			return false;
+    		}
+    	}
+    	while(!ss.isEmpty()&&!sss.isEmpty()){
+	    	int i = ss.pop();
+	    	int j= sss.pop();
+	    	if(j<i)return false;
+	    }
+
+	    return ss.isEmpty();
+    }
+
+
+}
+
+679. 24 Game
+Hard
+
+850
+
+168
+
+Add to List
+
+Share
+You have 4 cards each containing a number from 1 to 9. You need to judge whether they could operated through *, /, +, -, (, ) to get the value of 24.
+
+Example 1:
+Input: [4, 1, 8, 7]
+Output: True
+Explanation: (8-4) * (7-1) = 24
+Example 2:
+Input: [1, 2, 1, 2]
+Output: False
+Note:
+The division operator / represents real division, not integer division. For example, 4 / (1 - 2/3) = 12.
+Every operation done is between two numbers. In particular, we cannot use - as a unary operator. For example, with [1, 1, 1, 1] as input, the expression -1 - 1 - 1 - 1 is not allowed.
+You cannot concatenate numbers together. For example, if the input is [1, 2, 1, 2], we cannot write this as 12 + 12.
+
+class Solution {
+	public boolean judgePoint24(int[] nums) {
+		
+        boolean b= q(24,nums,new boolean[4],0);
+		if(!b){
+			boolean[] ii = new boolean[4];
+			int i = 0;
+			ii[i]=true;
+			for(int j = 1;j<4;j++){
+				ii[j]=true;
+				int a=nums[j]+nums[i],s=nums[j]-nums[i],d=nums[i]-nums[j];
+				
+
+				boolean q =false;
+				
+
+				if(a!=0){
+					q|=q(a/24,nums,ii)||q(24*a,nums,ii)||q(24/a,nums,ii);
+				}
+
+				if(s!=0){
+					q|=q(s/24,nums,ii)||q(24*s,nums,ii)||q(24/s,nums,ii);
+				}
+
+				if(d!=0){
+					q|=q(d/24,nums,ii)||q(24*d,nums,ii)||q(24/d,nums,ii);
+				}
+				if(!q){
+					ii[j]=false;
+					continue;
+				}
+				return true;
+				
+			}
+		}
+		return b;
+    }
+
+	public boolean q(double z,int[] nums,boolean[] ii){
+		Integer i ,j;
+		for(int q = 0;q<nums.length;q++){
+			if(!ii[q]){
+				if(i==null){
+					i=q;
+				}else{
+					j=q;
+				}
+			}
+		}
+		double a=(double)(nums[j]+nums[i]),s=(double)(nums[j]-nums[i]),d=(double)(nums[i]-nums[j]);
+		return z==a||z==s||z==d;
+	}
+
+
+	public boolean q(double z,int[] nums,boolean[] ii,int c){
+		boolean b = false;
+		for(int i=0;i<nums.length;i++){
+            if(ii[i]){
+				continue;
+			}
+			if(c==2){
+				return z==(double)nums[i];
+			}
+            ii[i]=true;
+			 b |= q(z/nums[i],nums,ii,c+1)||q(z-nums[i],nums,ii,c+1)||q(z+nums[i],nums,ii,c+1)||q(z*nums[i],nums,ii,c+1)||q(nums[i]-z,nums,ii,c+1)||q(nums[i]/z,nums,ii,c+1);
+			if(!b){
+				ii[i]=false;
+			}
+				
+		}
+		return b;
+	}
+
+    public boolean judgePoint24(int[] nums) {
+        List<Integer> list = new ArrayList<>();
+		for(int i : nums){
+			list.add(i);
+		}
+
+		return q(24,list,0);
+
+		return q(24,nums,new boolean[4]);
+    }
+
+	public boolean q(double z,int[] nums,boolean[] ii){
+		boolean b = false;
+		for(int i<0;i<nums.length;i++){
+			boolean b |= q(z/i,nums,ii)||q(z-i,nums,ii)||q(z+i,nums,ii)||q(z*i,nums,ii)||q(i-z,nums,ii)||q(i/z,nums,ii);
+			if(!b){
+				bb[i]=true;
+			}
+
+			
+			
+		}
+		return b;
+	}
+
+	public boolean q(double z,List<Integer> list,int c){
+		if(c==4){
+			return false;
+		}
+		if(list.size()==2){
+			return z(z,list.get(0),list.get(1));
+		}
+
+		Integer i = list.remove(0);
+		boolean b = q(z/i,list,c+1)||q(z-i,list,c+1)||q(z+i,list,c+1)||q(z*i,list,c+1)||q(i-z,list,c+1)||q(i/z,list,c+1);
+		if(!b){
+			list.add(i);
+		}
+		return b;
+
+	}
+
+	public boolean z(double z,int q,int w){
+		return z*q==w||z*w==q||z==w*q||z-w==q||z==w-q||z==q-w;
+	}
+}
+
+680. Valid Palindrome II
+Easy
+
+2245
+
+140
+
+Add to List
+
+Share
+Given a non-empty string s, you may delete at most one character. Judge whether you can make it a palindrome.
+
+Example 1:
+Input: "aba"
+Output: True
+Example 2:
+Input: "abca"
+Output: True
+Explanation: You could delete the character 'c'.
+Note:
+The string will only contain lowercase characters a-z. The maximum length of the string is 50000.
+
+class Solution {
+    public boolean validPalindrome(String s) {
+    	int[] ii = new int[]{0,s.length()-1};
+    	boolean b = q(s,ii);
+    	if(!b){
+    		b=q(s,new int[]{ii[0]+1,ii[1]})||q(s,new int[]{ii[0],ii[1]-1});
+    	}
+    	return b;
+        
+    }
+
+
+    public boolean q(String s,int[] ii){
+    	while(ii[0]<ii[1]){
+    		if(s.charAt(ii[0])==s.charAt(ii[1])){
+    			ii[0]++;
+    			ii[1]--;
+    		}else{
+    			return false;
+    		}
+    	}
+    	return ture;
+    }
+}
