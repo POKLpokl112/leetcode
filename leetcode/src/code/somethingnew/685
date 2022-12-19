@@ -40,6 +40,45 @@ ui != vi
 
 class Solution {
     public int[] findRedundantDirectedConnection(int[][] edges) {
-        
+        int[] root = new int[edges.length+1];
+        int[] f = null;
+        int[] l = null;
+
+        for(int[] e : edges){
+            if(root[e[1]]==0){
+                root[e[1]]=e[0];
+            }else{
+                f = new int[]{root[e[1]],e[1]};
+                l = new int[]{e[0],e[1]};
+                e[1]=0;
+            }
+        }
+
+        for(int i = 0; i<root.length;i++){
+            root[i] = i;
+        }
+
+        for(int[] e : edges){
+            if(e[1]==0)continue;    
+            int x = getRoot(e[0],root); int y = getRoot(e[1],root);
+            if(x==y){
+                return f!=null ? f : e;
+            }
+
+            root[x] = y;
+        }
+
+        return l;
+
+
+
+
+    }
+
+    public int getRoot(int i,int[] root){
+        while(i!=root[i]){
+            i=root[i];
+        }
+        return i;
     }
 }
